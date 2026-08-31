@@ -14,6 +14,9 @@
 
   <div class="page">
     <header class="topbar">
+      <button class="icon-btn docs-mobile-trigger" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
       <a class="wordmark" href="index.html">blaid.</a>
       <div class="topbar-right">
         <button class="icon-btn" aria-label="Search">
@@ -35,70 +38,125 @@
       <span class="current">Introduction</span>
     </div>
 
+    <div class="docs-overlay"></div>
+
     <div class="docs-shell">
       <aside class="docs-sidebar">
-        <button class="menu-toggle" aria-label="Toggle sidebar" style="margin-bottom: 20px;">
-          <span></span><span></span><span></span>
-        </button>
+        <div class="docs-nav-group">
+          <a href="embed-builder.html">Embed Builder</a>
+          <a data-invite-link href="#">Discord</a>
+        </div>
 
         <div class="docs-nav-group">
           <p class="docs-nav-label">GETTING STARTED</p>
-          <a href="docs.html" class="active">Introduction</a>
-          <a href="docs.html#setup">Server Setup</a>
-          <a href="docs.html#permissions">Permissions</a>
+          <a href="#introduction" class="active">Introduction</a>
+          <a href="#setup">Server Setup</a>
+          <a href="#permissions">Permissions</a>
         </div>
 
         <div class="docs-nav-group">
           <p class="docs-nav-label">FEATURES</p>
-          <a href="docs.html#moderation">Moderation</a>
-          <a href="docs.html#tickets">Tickets</a>
-          <a href="docs.html#levels">Leveling</a>
-          <a href="docs.html#voicemaster">VoiceMaster</a>
+          <a href="#moderation">Moderation</a>
+          <a href="#tickets">Tickets</a>
+          <a href="#levels">Leveling</a>
+          <a href="#voicemaster">VoiceMaster</a>
         </div>
 
         <div class="docs-nav-group">
           <p class="docs-nav-label">REFERENCE</p>
           <a href="commands.html">Commands</a>
           <a href="variables.html">Variables</a>
-          <a href="embed-builder.html">Embed Builder</a>
         </div>
 
         <div class="docs-nav-group">
           <p class="docs-nav-label">PREMIUM</p>
-          <a href="docs.html#premium">Plans &amp; Billing</a>
+          <a href="#premium">Plans &amp; Billing</a>
         </div>
       </aside>
 
       <main class="docs-content">
-        <h1>Introduction</h1>
-        <p class="docs-sub">Everything you need to get blaid running well in your server.</p>
+        <section id="introduction">
+          <h1>Introduction</h1>
+          <p class="docs-sub">Everything you need to get blaid running well in your server.</p>
+          <p>
+            blaid is an all-in-one Discord app: moderation and security, leveling,
+            tickets, VoiceMaster, giveaways, Last.fm, and a growing set of automation
+            tools, all in one bot.
+          </p>
+          <p>
+            Run <code>,help</code> in your server for an interactive command list, or
+            browse everything with search on the <a href="commands.html" style="color: var(--red-bright);">Commands</a> page.
+          </p>
+        </section>
 
-        <p>
-          blaid is an all-in-one Discord app: moderation and security, leveling,
-          tickets, VoiceMaster, giveaways, Last.fm, and a growing set of automation
-          tools, all in one bot.
-        </p>
+        <section id="setup">
+          <h2>Server Setup</h2>
+          <p>
+            Run <code>,setup</code> with Administrator permissions. This creates a
+            jail role and channel, a logs channel, and the category that holds them -
+            the minimum blaid needs before moderation commands like <code>,jail</code>
+            or <code>,ban</code> will work.
+          </p>
+          <p>
+            blaid's own role has to sit above any role it needs to manage. If setup
+            can't finish, it'll tell you exactly which role to drag it above.
+          </p>
+        </section>
 
-        <h2>Quick start</h2>
-        <p>
-          Invite blaid to your server, then run <code>,setup</code> with Administrator
-          permissions. This creates the jail role and channel, a logs channel, and
-          the category that holds them - the minimum blaid needs before moderation
-          commands like <code>,jail</code> or <code>,ban</code> will work.
-        </p>
+        <section id="permissions">
+          <h2>Permissions</h2>
+          <p>
+            Most commands check for a real Discord permission (Manage Guild, Ban
+            Members, and so on) before running - shown under "Permissions" on each
+            command's card. You can also grant a role permission to use a gated
+            command without giving them the real Discord permission, via
+            <code>,fakepermissions</code>.
+          </p>
+        </section>
 
-        <h2>Finding a command</h2>
-        <p>
-          Run <code>,help</code> in your server for an interactive list, or browse
-          every command with search and examples on the
-          <a href="commands.html" style="color: var(--red-bright);">Commands</a> page.
-        </p>
+        <section id="moderation">
+          <h2>Moderation</h2>
+          <p>
+            Bans, kicks, timeouts, warnings, jail, and a full antinuke/antiraid
+            system that watches for mass bans, webhook spam, and suspicious joins.
+            Every action is logged to your configured logs channel automatically.
+          </p>
+        </section>
 
-        <h2>Getting help</h2>
-        <p>
-          Join the support server from the menu in the top right if you get stuck -
-          someone's usually around.
-        </p>
+        <section id="tickets">
+          <h2>Tickets</h2>
+          <p>
+            Set up a ticket panel with <code>,tickets panel</code>, customize the
+            questions members answer when opening one, and claim/close/transcript
+            them from buttons right on the ticket channel.
+          </p>
+        </section>
+
+        <section id="levels">
+          <h2>Leveling</h2>
+          <p>
+            Members earn XP from chatting. Set level-up messages, role rewards per
+            level, and (with Server Premium) customize the level-up card itself.
+          </p>
+        </section>
+
+        <section id="voicemaster">
+          <h2>VoiceMaster</h2>
+          <p>
+            Join-to-create voice channels: members get their own temporary channel
+            they can lock, rename, or hand off, with buttons for the whole flow.
+          </p>
+        </section>
+
+        <section id="premium">
+          <h2>Plans &amp; Billing</h2>
+          <p>
+            blaid has two independent premium plans - see the full breakdown,
+            pricing, and what each one unlocks on the
+            <a href="premium.html" style="color: var(--red-bright);">Premium</a> page.
+            Run <code>,premium</code> in your server any time to buy or manage a plan.
+          </p>
+        </section>
       </main>
     </div>
   </div>
@@ -107,3 +165,4 @@
   <script src="js/app.js"></script>
 </body>
 </html>
+
