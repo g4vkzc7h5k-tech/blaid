@@ -2,41 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Variables — Blade</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Variables — blaid.</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <main>
-    <h1>Variables</h1>
-    <p class="lead">Use these inside welcome, goodbye, boost, and level-up messages. Unknown placeholders are left untouched.</p>
 
-    <div id="groups"></div>
-  </main>
+  <div class="loader">
+    <span class="loader-mark">blaid.</span>
+  </div>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="wordmark" href="index.html">blaid.</a>
+      <div class="topbar-right">
+        <button class="menu-toggle" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-panel">
+          <a href="index.html">Home</a>
+          <a href="commands.html">Commands</a>
+          <a data-support-link href="#">Discord</a>
+          <a href="docs.html">Documentation</a>
+          <a href="premium.html">Premium</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="builder-shell" style="max-width: 760px;">
+      <h1>Variables</h1>
+      <p class="lead">Use these inside welcome, goodbye, boost, ticket, and level-up messages. Unknown placeholders are left untouched.</p>
+      <div id="var-groups"></div>
+    </div>
+  </div>
 
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
-  <script>
-    renderNav("variables.html");
-    renderFooter('Blade Documentation');
-
-    async function load() {
-      const groupsEl = document.getElementById("groups");
-      try {
-        const data = await apiGet("/api/variables");
-        groupsEl.innerHTML = Object.entries(data.groups).map(([group, vars]) => `
-          <h2>${escapeHtml(group)}</h2>
-          ${vars.map(v => `
-            <div class="card">
-              <div class="cmd-syntax">${escapeHtml(v.name)}</div>
-              <div class="cmd-description">${escapeHtml(v.description)} — e.g. <code>${escapeHtml(v.example)}</code></div>
-            </div>
-          `).join("")}
-        `).join("");
-      } catch (e) {
-        groupsEl.innerHTML = `<p style="color: var(--text-muted)">Couldn't reach the Blade API at ${API_BASE}.</p>`;
-      }
-    }
-    load();
-  </script>
 </body>
 </html>
