@@ -32,7 +32,15 @@ Run:
 from __future__ import annotations
 
 import os
+import sys
 import time
+
+# Make the project root importable regardless of what Render (or any
+# other host) sets as the working directory/"root directory" - this
+# is calculated from this file's own location, so it's correct no
+# matter how the deploy is configured.
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+sys.path.insert(0, os.path.dirname(__file__))
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -91,7 +99,7 @@ VARIABLES = {
 @app.on_event("startup")
 def _load_commands_at_startup() -> None:
     global _commands_cache
-    from website.backend.command_export import build_commands_payload
+    from command_export import build_commands_payload
 
     try:
         _commands_cache = build_commands_payload()
