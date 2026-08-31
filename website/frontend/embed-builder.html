@@ -3,189 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Embed Builder — Blade</title>
-  <meta name="description" content="Build a Discord embed visually and copy the JSON straight into a Blade command.">
+  <title>Embed Builder — blaid.</title>
+  <meta name="description" content="Build a Discord embed visually and copy the JSON straight into any blaid command.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <main>
-    <h1>Embed Builder</h1>
-    <p class="lead">Build a Discord embed, preview it live exactly as it renders in Discord, and copy the result to use with any Blade command that accepts a custom embed.</p>
 
-    <div class="builder-grid">
-      <div>
-        <div class="field-row">
-          <div class="field-group">
-            <label>Author name</label>
-            <input type="text" id="f-author-name" placeholder="Blade">
-          </div>
-          <div class="field-group">
-            <label>Author icon URL</label>
-            <input type="text" id="f-author-icon" placeholder="https://...">
-          </div>
-        </div>
+  <div class="loader">
+    <span class="loader-mark">blaid.</span>
+  </div>
 
-        <div class="field-group">
-          <label>Title</label>
-          <input type="text" id="f-title" placeholder="Announcement">
-        </div>
-
-        <div class="field-group">
-          <label>Description</label>
-          <textarea id="f-desc" rows="4" placeholder="Something worth telling everyone. Supports {user.mention}, {guild.name}, etc."></textarea>
-        </div>
-
-        <div class="field-row">
-          <div class="field-group color-field">
-            <div style="flex:1;">
-              <label>Color</label>
-              <input type="text" id="f-color" placeholder="#c8303f" value="#c8303f">
-            </div>
-            <input type="color" id="f-color-picker" value="#c8303f">
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label>Thumbnail URL</label>
-          <input type="text" id="f-thumb" placeholder="https://...">
-        </div>
-
-        <div class="field-group">
-          <label>Image URL</label>
-          <input type="text" id="f-image" placeholder="https://...">
-        </div>
-
-        <div class="field-row">
-          <div class="field-group">
-            <label>Field name</label>
-            <input type="text" id="f-field-name" placeholder="Optional">
-          </div>
-          <div class="field-group">
-            <label>Field value</label>
-            <input type="text" id="f-field-value" placeholder="Optional">
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div class="field-group">
-            <label>Footer text</label>
-            <input type="text" id="f-footer" placeholder="Blade">
-          </div>
-          <div class="field-group">
-            <label>Footer icon URL</label>
-            <input type="text" id="f-footer-icon" placeholder="https://...">
-          </div>
-        </div>
-
-        <button class="btn" id="copy-btn">Copy JSON</button>
-        <pre class="json-output" id="json-output"></pre>
+  <div class="page">
+    <header class="topbar">
+      <a class="wordmark" href="index.html">blaid.</a>
+      <div class="topbar-right">
+        <button class="menu-toggle" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-panel">
+          <a href="index.html">Home</a>
+          <a href="commands.html">Commands</a>
+          <a data-support-link href="#">Discord</a>
+          <a href="docs.html">Documentation</a>
+          <a href="premium.html">Premium</a>
+        </nav>
       </div>
+    </header>
 
-      <div class="preview-frame">
-        <label style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: #949ba4;">Live Preview</label>
-        <div class="discord-embed" id="preview" style="margin-top: 10px;">
-          <img id="p-thumb" class="de-thumb" style="display:none;">
-          <div class="de-author" id="p-author" style="display:none;">
-            <img id="p-author-icon" style="display:none;">
-            <span id="p-author-text"></span>
-          </div>
-          <div class="de-title" id="p-title" style="display:none;"></div>
-          <div class="de-desc" id="p-desc"></div>
-          <div class="de-fields" id="p-fields" style="display:none;">
-            <div>
-              <div class="de-field-name" id="p-field-name"></div>
-              <div class="de-field-value" id="p-field-value"></div>
+    <div class="builder-shell">
+      <h1>Embed Builder</h1>
+      <p class="lead">Build a Discord embed, preview it exactly as it renders in Discord, and copy the result into any blaid command that accepts a custom embed.</p>
+
+      <div class="builder-grid">
+        <div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Author name</label>
+              <input type="text" id="f-author-name" placeholder="blaid.">
+            </div>
+            <div class="field-group">
+              <label>Author icon URL</label>
+              <input type="text" id="f-author-icon" placeholder="https://...">
             </div>
           </div>
-          <img id="p-image" class="de-image" style="display:none;">
-          <div class="de-footer" id="p-footer" style="display:none;">
-            <img id="p-footer-icon" style="display:none;">
-            <span id="p-footer-text"></span>
+
+          <div class="field-group">
+            <label>Title</label>
+            <input type="text" id="f-title" placeholder="Announcement">
           </div>
+
+          <div class="field-group">
+            <label>Description</label>
+            <textarea id="f-desc" rows="4" placeholder="Something worth telling everyone. Supports {user.mention}, {guild.name}, etc."></textarea>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group color-field">
+              <div style="flex:1;">
+                <label>Color</label>
+                <input type="text" id="f-color" placeholder="#8B1E2F" value="#8B1E2F">
+              </div>
+              <input type="color" id="f-color-picker" value="#8B1E2F">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Thumbnail URL</label>
+            <input type="text" id="f-thumb" placeholder="https://...">
+          </div>
+
+          <div class="field-group">
+            <label>Image URL</label>
+            <input type="text" id="f-image" placeholder="https://...">
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Field name</label>
+              <input type="text" id="f-field-name" placeholder="Optional">
+            </div>
+            <div class="field-group">
+              <label>Field value</label>
+              <input type="text" id="f-field-value" placeholder="Optional">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Footer text</label>
+              <input type="text" id="f-footer" placeholder="blaid.">
+            </div>
+            <div class="field-group">
+              <label>Footer icon URL</label>
+              <input type="text" id="f-footer-icon" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-sticky">
+          <div class="discord-preview-shell">
+            <p style="font-size: 0.72rem; letter-spacing: 0.04em; color: var(--text-faint); margin: 0 0 12px;">Live preview</p>
+            <div class="discord-embed" id="preview">
+              <img id="p-thumb" class="de-thumb" style="display:none;">
+              <div class="de-author" id="p-author" style="display:none;">
+                <img id="p-author-icon" style="display:none;">
+                <span id="p-author-text"></span>
+              </div>
+              <div class="de-title" id="p-title" style="display:none;"></div>
+              <div class="de-desc" id="p-desc"></div>
+              <div class="de-fields" id="p-fields" style="display:none;">
+                <div>
+                  <div class="de-field-name" id="p-field-name"></div>
+                  <div class="de-field-value" id="p-field-value"></div>
+                </div>
+              </div>
+              <img id="p-image" class="de-image" style="display:none;">
+              <div class="de-footer" id="p-footer" style="display:none;">
+                <img id="p-footer-icon" style="display:none;">
+                <span id="p-footer-text"></span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn primary" id="copy-btn" style="margin-top: 16px; width: 100%;">Copy JSON</button>
+          <pre class="json-output" id="json-output"></pre>
         </div>
       </div>
     </div>
-  </main>
+  </div>
 
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
-  <script>
-    renderNav("embed-builder.html");
-    renderFooter('Blade Embed Builder');
-
-    const ids = [
-      "author-name", "author-icon", "title", "desc", "color", "thumb", "image",
-      "field-name", "field-value", "footer", "footer-icon",
-    ];
-    const fields = Object.fromEntries(ids.map(id => [id, document.getElementById(`f-${id}`)]));
-    const colorPicker = document.getElementById("f-color-picker");
-
-    function setImg(el, url) {
-      if (url) { el.src = url; el.style.display = "inline-block"; } else { el.style.display = "none"; }
-    }
-
-    function update() {
-      const v = Object.fromEntries(ids.map(id => [id, fields[id].value.trim()]));
-
-      const authorEl = document.getElementById("p-author");
-      if (v["author-name"]) {
-        authorEl.style.display = "flex";
-        document.getElementById("p-author-text").textContent = v["author-name"];
-        setImg(document.getElementById("p-author-icon"), v["author-icon"]);
-      } else {
-        authorEl.style.display = "none";
-      }
-
-      const titleEl = document.getElementById("p-title");
-      titleEl.textContent = v.title;
-      titleEl.style.display = v.title ? "block" : "none";
-
-      document.getElementById("p-desc").textContent = v.desc;
-      setImg(document.getElementById("p-thumb"), v.thumb);
-      setImg(document.getElementById("p-image"), v.image);
-
-      const fieldsEl = document.getElementById("p-fields");
-      if (v["field-name"] || v["field-value"]) {
-        fieldsEl.style.display = "grid";
-        document.getElementById("p-field-name").textContent = v["field-name"];
-        document.getElementById("p-field-value").textContent = v["field-value"];
-      } else {
-        fieldsEl.style.display = "none";
-      }
-
-      const footerEl = document.getElementById("p-footer");
-      if (v.footer || v["footer-icon"]) {
-        footerEl.style.display = "flex";
-        document.getElementById("p-footer-text").textContent = v.footer;
-        setImg(document.getElementById("p-footer-icon"), v["footer-icon"]);
-      } else {
-        footerEl.style.display = "none";
-      }
-
-      const isValidColor = /^#[0-9a-fA-F]{6}$/.test(v.color);
-      document.getElementById("preview").style.borderLeftColor = isValidColor ? v.color : "var(--accent)";
-      if (isValidColor) colorPicker.value = v.color;
-
-      const payload = {
-        title: v.title || null,
-        description: v.desc || null,
-        color: isValidColor ? parseInt(v.color.replace("#", ""), 16) : null,
-        thumbnail: v.thumb ? { url: v.thumb } : null,
-        image: v.image ? { url: v.image } : null,
-        author: v["author-name"] ? { name: v["author-name"], icon_url: v["author-icon"] || null } : null,
-        footer: (v.footer || v["footer-icon"]) ? { text: v.footer || null, icon_url: v["footer-icon"] || null } : null,
-        fields: (v["field-name"] || v["field-value"]) ? [{ name: v["field-name"], value: v["field-value"], inline: false }] : [],
-      };
-      document.getElementById("json-output").textContent = JSON.stringify(payload, null, 2);
-    }
-
-    Object.values(fields).forEach(f => f.addEventListener("input", update));
-    colorPicker.addEventListener("input", () => { fields.color.value = colorPicker.value; update(); });
-    update();
-
-    document.getElementById("copy-btn").addEventListener("click", () => {
-      navigator.clipboard.writeText(document.getElementById("json-output").textContent);
-    });
-  </script>
 </body>
 </html>
