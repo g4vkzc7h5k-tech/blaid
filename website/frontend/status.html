@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Status — Blade</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <h1>Status</h1>
+    <div class="status-hero">
+      <p class="lead" id="status-line"><span class="status-dot"></span>Checking...</p>
+    </div>
+
+    <div class="status-grid" style="margin-top: 24px;">
+      <div class="card">
+        <div class="value" id="stat-guilds">—</div>
+        <div class="label">Servers</div>
+      </div>
+      <div class="card">
+        <div class="value" id="stat-users">—</div>
+        <div class="label">Users</div>
+      </div>
+      <div class="card">
+        <div class="value" id="stat-latency">—</div>
+        <div class="label">Latency</div>
+      </div>
+      <div class="card">
+        <div class="value" id="stat-uptime">—</div>
+        <div class="label">Uptime</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    renderNav("status.html");
+    renderFooter('Blade Status — refreshes every 30s');
+
+    function formatUptime(seconds) {
+      const d = Math.floor(seconds / 86400);
+      const h = Math.floor((seconds % 86400) / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      return `${d}d ${h}h ${m}m`;
+    }
+
+    async function load() {
+      const line = document.getElementById("status-line");
+      try {
+        const data = await apiGet("/api/status");
+        if (!data.online) {
+          line.innerHTML = `<span class="status-dot offline"></span>Offline${data.reason ? " — " + escapeHtml(data.reason) : ""}`;
+          return;
+        }
+        line.innerHTML = `<span class="status-dot online"></span>Online`;
+        document.getElementById("stat-guilds").textContent = data.guild_count?.toLocaleString() ?? "—";
+        document.getElementById("stat-users").textContent = data.user_count?.toLocaleString() ?? "—";
+        document.getElementById("stat-latency").textContent = data.latency_ms != null ? `${data.latency_ms}ms` : "—";
+        const uptimeSeconds = Date.now() / 1000 - data.started_at;
+        document.getElementById("stat-uptime").textContent = formatUptime(uptimeSeconds);
+      } catch (e) {
+        line.innerHTML = `<span class="status-dot offline"></span>Couldn't reach the Blade API.`;
+      }
+    }
+
+    load();
+    setInterval(load, 30000);
+  </script>
+</body>
+</html>

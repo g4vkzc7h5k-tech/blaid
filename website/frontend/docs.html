@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Introduction — blaid. Docs</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="loader">
+    <span class="loader-mark">blaid.</span>
+  </div>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="wordmark" href="index.html">blaid.</a>
+      <div class="topbar-right">
+        <button class="icon-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+        <button class="icon-btn dot-trigger" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+        </button>
+        <div class="dot-panel">
+          <a data-support-link href="#">Support Server</a>
+          <a href="index.html">Home</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="docs-crumb">
+      <span>Docs</span>
+      <span class="sep">/</span>
+      <span class="current">Introduction</span>
+    </div>
+
+    <div class="docs-shell">
+      <aside class="docs-sidebar">
+        <button class="menu-toggle" aria-label="Toggle sidebar" style="margin-bottom: 20px;">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="docs-nav-group">
+          <p class="docs-nav-label">GETTING STARTED</p>
+          <a href="docs.html" class="active">Introduction</a>
+          <a href="docs.html#setup">Server Setup</a>
+          <a href="docs.html#permissions">Permissions</a>
+        </div>
+
+        <div class="docs-nav-group">
+          <p class="docs-nav-label">FEATURES</p>
+          <a href="docs.html#moderation">Moderation</a>
+          <a href="docs.html#tickets">Tickets</a>
+          <a href="docs.html#levels">Leveling</a>
+          <a href="docs.html#voicemaster">VoiceMaster</a>
+        </div>
+
+        <div class="docs-nav-group">
+          <p class="docs-nav-label">REFERENCE</p>
+          <a href="commands.html">Commands</a>
+          <a href="variables.html">Variables</a>
+          <a href="embed-builder.html">Embed Builder</a>
+        </div>
+
+        <div class="docs-nav-group">
+          <p class="docs-nav-label">PREMIUM</p>
+          <a href="docs.html#premium">Plans &amp; Billing</a>
+        </div>
+      </aside>
+
+      <main class="docs-content">
+        <h1>Introduction</h1>
+        <p class="docs-sub">Everything you need to get blaid running well in your server.</p>
+
+        <p>
+          blaid is an all-in-one Discord app: moderation and security, leveling,
+          tickets, VoiceMaster, giveaways, Last.fm, and a growing set of automation
+          tools, all in one bot.
+        </p>
+
+        <h2>Quick start</h2>
+        <p>
+          Invite blaid to your server, then run <code>,setup</code> with Administrator
+          permissions. This creates the jail role and channel, a logs channel, and
+          the category that holds them - the minimum blaid needs before moderation
+          commands like <code>,jail</code> or <code>,ban</code> will work.
+        </p>
+
+        <h2>Finding a command</h2>
+        <p>
+          Run <code>,help</code> in your server for an interactive list, or browse
+          every command with search and examples on the
+          <a href="commands.html" style="color: var(--red-bright);">Commands</a> page.
+        </p>
+
+        <h2>Getting help</h2>
+        <p>
+          Join the support server from the menu in the top right if you get stuck -
+          someone's usually around.
+        </p>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

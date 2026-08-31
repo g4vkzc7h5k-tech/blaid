@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Commands — blaid.</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="loader">
+    <span class="loader-mark">blaid.</span>
+  </div>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="wordmark" href="index.html">blaid.</a>
+      <div class="topbar-right">
+        <button class="menu-toggle" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-panel">
+          <a href="index.html">Home</a>
+          <a href="status.html">Status</a>
+          <a data-support-link href="#">Discord</a>
+          <a href="docs.html">Documentation</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="cmd-header">
+      <h1>Commands</h1>
+      <div class="cmd-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="cmd-search-input" type="text" placeholder="Search commands...">
+      </div>
+    </div>
+
+    <div class="cmd-body">
+      <!-- Populated by js/app.js from the live /api/commands endpoint -->
+      <p style="color: var(--text-faint); text-align:center; padding: 60px 0;">Loading commands…</p>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

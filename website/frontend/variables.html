@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Variables — Blade</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <h1>Variables</h1>
+    <p class="lead">Use these inside welcome, goodbye, boost, and level-up messages. Unknown placeholders are left untouched.</p>
+
+    <div id="groups"></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    renderNav("variables.html");
+    renderFooter('Blade Documentation');
+
+    async function load() {
+      const groupsEl = document.getElementById("groups");
+      try {
+        const data = await apiGet("/api/variables");
+        groupsEl.innerHTML = Object.entries(data.groups).map(([group, vars]) => `
+          <h2>${escapeHtml(group)}</h2>
+          ${vars.map(v => `
+            <div class="card">
+              <div class="cmd-syntax">${escapeHtml(v.name)}</div>
+              <div class="cmd-description">${escapeHtml(v.description)} — e.g. <code>${escapeHtml(v.example)}</code></div>
+            </div>
+          `).join("")}
+        `).join("");
+      } catch (e) {
+        groupsEl.innerHTML = `<p style="color: var(--text-muted)">Couldn't reach the Blade API at ${API_BASE}.</p>`;
+      }
+    }
+    load();
+  </script>
+</body>
+</html>

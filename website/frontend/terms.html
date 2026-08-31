@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Terms of Service — Blade</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <h1>Terms of Service</h1>
+    <p class="lead">Last updated: August 22, 2026</p>
+
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="cmd-description">
+        <strong>This is a starting template, not legal advice.</strong> It's written to genuinely
+        reflect what Blade actually does, but you (the operator) are responsible for having it
+        reviewed by a lawyer for your jurisdiction before relying on it, and for filling in the
+        bracketed placeholders below.
+      </div>
+    </div>
+
+    <h2>1. Acceptance of Terms</h2>
+    <p>
+      By inviting Blade ("the Bot", "we", "us") to your Discord server, or by using any command
+      or feature of the Bot, you agree to these Terms of Service and to our
+      <a href="privacy.html">Privacy Policy</a>. If you do not agree, remove the Bot from your
+      server and stop using it.
+    </p>
+
+    <h2>2. What Blade Does</h2>
+    <p>
+      Blade is a Discord bot providing server moderation, leveling, ticket support, VoiceMaster
+      temporary voice channels, giveaways, autorole and autoresponders, a configurable chat
+      filter, antinuke protection, and related utility commands. Features and their exact
+      behavior may change over time as the Bot is updated.
+    </p>
+
+    <h2>3. Eligibility</h2>
+    <p>
+      You must meet Discord's own minimum age and eligibility requirements to use Discord, and by
+      extension the Bot. You are responsible for ensuring your use of the Bot complies with
+      Discord's Terms of Service and Community Guidelines at all times.
+    </p>
+
+    <h2>4. Server Owner and Admin Responsibilities</h2>
+    <p>
+      Anyone with permission to configure the Bot in a server (server owners, administrators,
+      antinuke admins, or anyone granted a fake permission through the Bot) is responsible for how
+      it's configured in that server - including moderation punishments, chat filter rules, fake
+      permissions granted to roles, and antinuke settings. We are not responsible for
+      misconfiguration or misuse of these features by your server's own staff.
+    </p>
+
+    <h2>5. Data</h2>
+    <p>
+      A summary of what the Bot stores and why is in our <a href="privacy.html">Privacy Policy</a>.
+      By using the Bot you consent to that data handling.
+    </p>
+
+    <h2>6. Prohibited Uses</h2>
+    <p>You may not use the Bot to:</p>
+    <ul>
+      <li>Violate any applicable law or Discord's own Terms of Service;</li>
+      <li>Harass, threaten, or abuse other users, including through moderation features misused
+        against innocent members;</li>
+      <li>Attempt to exploit, reverse-engineer, or interfere with the Bot's operation or hosting
+        infrastructure;</li>
+      <li>Circumvent rate limits, permission checks, or other safeguards built into the Bot.</li>
+    </ul>
+
+    <h2>7. Availability and Changes</h2>
+    <p>
+      The Bot is provided on a best-effort basis. We do not guarantee uptime, and the Bot may be
+      unavailable for maintenance, updates, or reasons outside our control (including Discord API
+      outages). Features may be added, changed, or removed at any time.
+    </p>
+
+    <h2>8. Termination</h2>
+    <p>
+      You may remove the Bot from your server at any time. We reserve the right to restrict or
+      block a server or user's access to the Bot for violating these Terms, abusing the service,
+      or for any other reason at our discretion.
+    </p>
+
+    <h2>9. Disclaimer of Warranties</h2>
+    <p>
+      The Bot is provided "as is" and "as available," without warranties of any kind, express or
+      implied, including fitness for a particular purpose. Some features (such as the "malicious"
+      and "nsfw" chat filter categories) rely on basic heuristics rather than comprehensive
+      threat-intelligence or content-classification services, and should not be relied on as a
+      complete safety solution.
+    </p>
+
+    <h2>10. Limitation of Liability</h2>
+    <p>
+      To the maximum extent permitted by law, we are not liable for any indirect, incidental, or
+      consequential damages arising from your use of, or inability to use, the Bot - including
+      moderation actions taken (or not taken) by the Bot, or data loss.
+    </p>
+
+    <h2>11. Governing Law</h2>
+    <p>
+      These Terms are governed by the laws of <strong>[Your Jurisdiction - fill this in]</strong>,
+      without regard to conflict-of-law principles.
+    </p>
+
+    <h2>12. Changes to These Terms</h2>
+    <p>
+      We may update these Terms from time to time. Continued use of the Bot after changes take
+      effect constitutes acceptance of the revised Terms.
+    </p>
+
+    <h2>13. Contact</h2>
+    <p>
+      Questions about these Terms can be sent through our
+      <a id="support-link" href="#">support server</a>.
+    </p>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    renderNav("terms.html");
+    renderFooter();
+    document.getElementById("support-link").href = BLADE_LINKS.support;
+  </script>
+</body>
+</html>

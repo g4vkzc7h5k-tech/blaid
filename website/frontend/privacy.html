@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Privacy Policy — Blade</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <h1>Privacy Policy</h1>
+    <p class="lead">Last updated: August 22, 2026</p>
+
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="cmd-description">
+        <strong>This is a starting template, not legal advice.</strong> It's written to genuinely
+        reflect what Blade actually stores based on its current features, but you (the operator)
+        are responsible for having it reviewed by a lawyer for your jurisdiction (e.g. GDPR/CCPA
+        obligations) and for filling in the bracketed placeholders below.
+      </div>
+    </div>
+
+    <h2>1. Introduction</h2>
+    <p>
+      This Privacy Policy explains what data Blade ("the Bot", "we", "us") collects when it's
+      added to a Discord server, how it's used, and how you can request it be removed.
+    </p>
+
+    <h2>2. Data We Collect</h2>
+    <p>Depending on which features a server enables, the Bot may store:</p>
+    <ul>
+      <li><strong>Identifiers:</strong> Discord server, channel, role, and user IDs - needed to
+        know which server a setting applies to and who a command targets.</li>
+      <li><strong>Moderation records:</strong> ban/kick/warn/timeout case history, jail records,
+        and chat-filter strike counts, tied to a server and user ID.</li>
+      <li><strong>Server configuration:</strong> settings server admins choose - filtered
+        words/phrases/regex patterns, antinuke module settings and admin lists, fake permissions
+        granted to roles, level roles and XP multipliers, giveaway settings, ticket panel/option
+        configuration, welcome/leave/boost message templates, and similar.</li>
+      <li><strong>Leveling data:</strong> per-user XP and level, per server.</li>
+      <li><strong>Ticket transcripts:</strong> a plaintext log of messages sent in a ticket
+        channel, saved when the ticket is closed.</li>
+      <li><strong>Message content, transiently:</strong> the chat filter and autoresponder
+        features read message content to check it against configured rules at the moment a
+        message is sent. Message content itself is not stored, except where it becomes part of a
+        ticket transcript as described above.</li>
+    </ul>
+    <p>
+      We do not collect payment information, and the Bot does not have access to direct messages
+      outside of ticket-related notifications it sends you.
+    </p>
+
+    <h2>3. How We Use Data</h2>
+    <p>
+      Data is used solely to provide the Bot's features in the server(s) it's added to - for
+      example, showing your level, honoring a ticket's configuration, or enforcing a configured
+      punishment. We do not sell data, share it with advertisers, or use it for any purpose
+      unrelated to operating the Bot.
+    </p>
+
+    <h2>4. Data Retention</h2>
+    <p>
+      Server-specific data is retained for as long as the Bot remains in that server. Removing the
+      Bot from a server does not necessarily delete that server's data immediately, but you can
+      request deletion at any time (see Section 7).
+    </p>
+
+    <h2>5. Third Parties</h2>
+    <p>
+      The Bot operates through Discord's API and is hosted on <strong>[Your Hosting
+      Provider]</strong>. These third parties process data as necessary to run the Bot, under
+      their own respective privacy policies. We do not share data with any other third party.
+    </p>
+
+    <h2>6. Children's Privacy</h2>
+    <p>
+      The Bot is only used through Discord, which has its own minimum age requirement. We do not
+      knowingly collect data beyond what a server's use of Discord and the Bot already involves,
+      and do not knowingly target the Bot at anyone below Discord's minimum age.
+    </p>
+
+    <h2>7. Your Rights</h2>
+    <p>
+      You can request a copy of, or deletion of, data associated with your Discord user ID or your
+      server, by reaching out through our <a id="support-link-1" href="#">support server</a>. We
+      will respond and act on verified requests within a reasonable time.
+    </p>
+
+    <h2>8. Data Security</h2>
+    <p>
+      We take reasonable measures to protect stored data, but no method of storage or transmission
+      is completely secure, and we cannot guarantee absolute security.
+    </p>
+
+    <h2>9. Changes to This Policy</h2>
+    <p>
+      We may update this Privacy Policy from time to time. Continued use of the Bot after changes
+      take effect constitutes acceptance of the revised policy.
+    </p>
+
+    <h2>10. Contact</h2>
+    <p>
+      Questions about this policy, or data requests, can be sent through our
+      <a id="support-link-2" href="#">support server</a>.
+    </p>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    renderNav("privacy.html");
+    renderFooter();
+    document.getElementById("support-link-1").href = BLADE_LINKS.support;
+    document.getElementById("support-link-2").href = BLADE_LINKS.support;
+  </script>
+</body>
+</html>
