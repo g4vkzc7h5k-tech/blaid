@@ -116,10 +116,18 @@ function applyLinks() {
 
 // ---------------------------------------------------------- commands page
 
+function showSkeleton(container, count = 5) {
+  container.innerHTML = Array.from({ length: count })
+    .map(() => '<div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line"></div></div>')
+    .join("");
+}
+
 async function loadCommands() {
   const body = document.querySelector(".cmd-body");
   const chipBar = document.querySelector(".chip-bar");
   if (!body) return;
+
+  showSkeleton(body, 6);
 
   const searchInput = document.querySelector("#cmd-search-input");
   let allCommands = [];
@@ -297,6 +305,8 @@ async function loadStatus() {
 async function loadVariables() {
   const groupsEl = document.querySelector("#var-groups");
   if (!groupsEl) return;
+
+  showSkeleton(groupsEl, 8);
 
   try {
     const res = await fetch(`${API_BASE}/api/variables`);
