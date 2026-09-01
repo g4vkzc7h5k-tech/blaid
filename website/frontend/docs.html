@@ -44,7 +44,6 @@
       <aside class="docs-sidebar">
         <div class="docs-nav-group">
           <a href="embed-builder.html">Embed Builder</a>
-          <a data-support-link href="#">Discord</a>
         </div>
 
         <div class="docs-nav-group">
@@ -52,14 +51,19 @@
           <a href="#introduction" class="active">Introduction</a>
           <a href="#setup">Server Setup</a>
           <a href="#permissions">Permissions</a>
+          <a href="#prefixes">Prefixes</a>
         </div>
 
         <div class="docs-nav-group">
           <p class="docs-nav-label">FEATURES</p>
           <a href="#moderation">Moderation</a>
+          <a href="#antinuke">Antinuke &amp; Antiraid</a>
           <a href="#tickets">Tickets</a>
           <a href="#levels">Leveling</a>
           <a href="#voicemaster">VoiceMaster</a>
+          <a href="#lastfm">Last.fm</a>
+          <a href="#giveaways">Giveaways</a>
+          <a href="#automation">Automation</a>
         </div>
 
         <div class="docs-nav-group">
@@ -81,7 +85,13 @@
           <p>
             blaid is an all-in-one Discord app: moderation and security, leveling,
             tickets, VoiceMaster, giveaways, Last.fm, and a growing set of automation
-            tools, all in one bot.
+            tools, all in one bot. It's built to replace several single-purpose bots
+            with one consistent, well-documented one.
+          </p>
+          <p>
+            Every command on this site is pulled directly from the bot's own code, so
+            what you see here always matches what's actually running - nothing here
+            is hand-written documentation that can drift out of date.
           </p>
           <p>
             Run <code>,help</code> in your server for an interactive command list, or
@@ -92,14 +102,27 @@
         <section id="setup" class="reveal">
           <h2>Server Setup</h2>
           <p>
-            Run <code>,setup</code> with Administrator permissions. This creates a
-            jail role and channel, a logs channel, and the category that holds them -
-            the minimum blaid needs before moderation commands like <code>,jail</code>
-            or <code>,ban</code> will work.
+            Run <code>,setup</code> with Administrator permissions. This is the one
+            command that needs to happen before most moderation features will work.
+            It creates:
           </p>
           <p>
-            blaid's own role has to sit above any role it needs to manage. If setup
-            can't finish, it'll tell you exactly which role to drag it above.
+            A jailed role and a jail channel only that role can see, a dedicated logs
+            channel that every moderation action gets reported to, and a category
+            that holds both of those channels so they stay organized and out of the
+            way of your regular channels.
+          </p>
+          <p>
+            blaid's own role has to sit above every role it needs to manage - the
+            jailed role included. If setup can't finish because of that, it tells you
+            exactly which role to drag blaid above in Server Settings, then you just
+            run <code>,setup</code> again.
+          </p>
+          <p>
+            Made a mistake or want to start over? <code>,setup reset</code> tears
+            everything back down cleanly: it unjails anyone currently jailed, deletes
+            the jail role, and removes the channels and category, so you can run
+            <code>,setup</code> fresh.
           </p>
         </section>
 
@@ -107,19 +130,64 @@
           <h2>Permissions</h2>
           <p>
             Most commands check for a real Discord permission (Manage Guild, Ban
-            Members, and so on) before running - shown under "Permissions" on each
-            command's card. You can also grant a role permission to use a gated
-            command without giving them the real Discord permission, via
-            <code>,fakepermissions</code>.
+            Members, Manage Roles, and so on) before running - whichever permission
+            a command needs is shown on its card on the Commands page.
+          </p>
+          <p>
+            Sometimes you want a role to be able to use a specific blaid command
+            without handing out the real, powerful Discord permission that command
+            normally requires - a moderator role that can use <code>,ban</code>
+            without actually having server-wide Ban Members, for example.
+            <code>,fakepermissions</code> lets you grant that on a per-role,
+            per-permission basis, just for blaid.
+          </p>
+          <p>
+            You can also disable individual commands per server with <code>,disable</code>
+            - server-wide, or scoped to a specific channel or role - and bring them
+            back with <code>,enable</code>.
+          </p>
+        </section>
+
+        <section id="prefixes" class="reveal">
+          <h2>Prefixes</h2>
+          <p>
+            The default prefix is <code>,</code>. Server admins can change the
+            server-wide prefix, and any member can additionally set their own
+            personal prefix that works for them specifically in every server blaid
+            is in - handy if the server prefix clashes with another bot you use.
           </p>
         </section>
 
         <section id="moderation" class="reveal">
           <h2>Moderation</h2>
           <p>
-            Bans, kicks, timeouts, warnings, jail, and a full antinuke/antiraid
-            system that watches for mass bans, webhook spam, and suspicious joins.
-            Every action is logged to your configured logs channel automatically.
+            The full toolkit: bans (including a hardban that also deletes recent
+            message history, and a softban that bans-then-unbans purely to clear
+            messages), kicks, timeouts, warnings with a full history you can review
+            later, and jail - a role-based mute that removes access to the whole
+            server except one channel, for when a timeout isn't enough but a ban is
+            too much.
+          </p>
+          <p>
+            Every action - who did what, to whom, and why - is written to your
+            configured logs channel automatically, with a running case number so
+            nothing gets lost.
+          </p>
+        </section>
+
+        <section id="antinuke" class="reveal">
+          <h2>Antinuke &amp; Antiraid</h2>
+          <p>
+            Antinuke watches for the exact patterns a compromised admin account or a
+            malicious bot uses to destroy a server fast - mass channel deletion, mass
+            banning, webhook abuse, dangerous permission grants - and can strip roles,
+            kick, or ban the account responsible before real damage is done, all with
+            thresholds you control.
+          </p>
+          <p>
+            Antiraid is the join-side counterpart: it looks at mass joins, brand new
+            accounts, default avatars, and suspicious username patterns to catch a
+            coordinated raid as it's happening, not after.
           </p>
         </section>
 
@@ -127,24 +195,58 @@
           <h2>Tickets</h2>
           <p>
             Set up a ticket panel with <code>,tickets panel</code>, customize the
-            questions members answer when opening one, and claim/close/transcript
-            them from buttons right on the ticket channel.
+            questions members answer when opening one, and route different ticket
+            types to different categories. Staff claim, close, reopen, and delete
+            tickets right from buttons on the channel itself, and every closed
+            ticket can generate a transcript automatically.
           </p>
         </section>
 
         <section id="levels" class="reveal">
           <h2>Leveling</h2>
           <p>
-            Members earn XP from chatting. Set level-up messages, role rewards per
-            level, and (with Server Premium) customize the level-up card itself.
+            Members earn XP from chatting and level up over time. Configure the
+            level-up message, assign role rewards at specific levels, and - with
+            Server Premium - customize the level-up card's look for your server.
           </p>
         </section>
 
         <section id="voicemaster" class="reveal">
           <h2>VoiceMaster</h2>
           <p>
-            Join-to-create voice channels: members get their own temporary channel
-            they can lock, rename, or hand off, with buttons for the whole flow.
+            Join-to-create voice channels: members joining your hub channel get
+            their own temporary voice channel they fully control - lock it, rename
+            it, set a user limit, or hand ownership to someone else - all through
+            buttons on a control panel, no commands to memorize.
+          </p>
+        </section>
+
+        <section id="lastfm" class="reveal">
+          <h2>Last.fm</h2>
+          <p>
+            Link a Last.fm account with <code>,lastfm set</code>, then check what
+            you're currently playing with <code>,fm</code>, browse your top artists,
+            albums, and tracks, compare taste with friends, and see who in the
+            server has played a given artist the most.
+          </p>
+        </section>
+
+        <section id="giveaways" class="reveal">
+          <h2>Giveaways</h2>
+          <p>
+            Start a giveaway with a duration, a winner count, and an optional role
+            requirement to enter. blaid picks winners automatically when it ends,
+            and you can reroll a winner at any time if needed.
+          </p>
+        </section>
+
+        <section id="automation" class="reveal">
+          <h2>Automation</h2>
+          <p>
+            Autoresponders reply automatically to trigger words, autoreacts add
+            reactions to messages containing a keyword, join DMs welcome new members
+            in their DMs, and scheduled messages post - once or on a repeating
+            interval - without you needing to be there to send them.
           </p>
         </section>
 
@@ -165,4 +267,3 @@
   <script src="js/app.js"></script>
 </body>
 </html>
-
