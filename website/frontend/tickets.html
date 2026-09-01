@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tickets — blaid.</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="loader">
+    <span class="loader-mark">blaid.</span>
+  </div>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="wordmark" href="index.html">blaid.</a>
+      <div class="topbar-right">
+        <button class="menu-toggle" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-panel">
+          <a href="index.html">Home</a>
+          <a href="commands.html">Commands</a>
+          <a href="embed-builder.html">Embed Builder</a>
+          <a href="status.html">Status</a>
+          <a data-support-link href="#">Discord</a>
+          <a href="docs.html">Documentation</a>
+          <a href="premium.html">Premium</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="builder-shell">
+      <h1>Ticket Builder</h1>
+      <p class="lead">Build a full ticket panel - options, forms, and all - visually, and send it straight to your server.</p>
+
+      <!-- Logged-out state -->
+      <div id="tickets-logged-out" class="how-to-get" style="display:none;">
+        <p class="how-to-eyebrow">Log in to get started</p>
+        <p class="how-to-step">Sign in with Discord to pick a server you manage and build a ticket panel for it.</p>
+        <a class="btn primary how-to-btn" href="#" id="login-btn">Login with Discord</a>
+      </div>
+
+      <!-- Logged-in state -->
+      <div id="tickets-app" style="display:none;">
+        <div class="field-group" style="max-width: 360px; margin-bottom: 28px;">
+          <label>Server</label>
+          <select id="guild-select"></select>
+        </div>
+
+        <div class="ticket-tabs">
+          <button class="ticket-tab active" data-tab="panel">Panel</button>
+          <button class="ticket-tab" data-tab="forms">Forms</button>
+          <button class="ticket-tab" data-tab="options">Options</button>
+        </div>
+
+        <!-- ============================================================ PANEL ============================================================ -->
+        <div class="ticket-tab-content" id="tab-panel">
+          <h3 class="section-heading">Basics</h3>
+          <div class="field-group">
+            <label>Panel title</label>
+            <input type="text" id="p-title" value="Need help?">
+          </div>
+          <div class="field-group">
+            <label>Panel description</label>
+            <textarea id="p-desc" rows="3">Click the button below to open a ticket.</textarea>
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Button label</label>
+              <input type="text" id="p-button-label" value="Open Ticket">
+            </div>
+            <div class="field-group">
+              <label>Mode</label>
+              <select id="p-mode">
+                <option value="dropdown">Dropdown (2+ options)</option>
+                <option value="buttons">Buttons</option>
+              </select>
+            </div>
+          </div>
+
+          <h3 class="section-heading">Category</h3>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Default ticket category</label>
+              <select id="p-category"></select>
+            </div>
+            <div class="field-group">
+              <label>Closed ticket category</label>
+              <select id="p-closed-category"></select>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Log channel</label>
+            <select id="p-log-channel"></select>
+          </div>
+
+          <h3 class="section-heading">Behaviour</h3>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Delete delay (seconds)</label>
+              <input type="number" id="p-delete-delay" value="0" min="0">
+            </div>
+            <div class="field-group">
+              <label>Max open tickets per member</label>
+              <input type="number" id="p-max-open" value="1" min="1">
+            </div>
+          </div>
+          <div class="checkbox-row">
+            <label><input type="checkbox" id="p-auto-pin"> Auto-pin ticket controls</label>
+            <label><input type="checkbox" id="p-claims-enabled" checked> Claims enabled</label>
+            <label><input type="checkbox" id="p-logs-enabled"> Ticket-closed logs enabled</label>
+          </div>
+          <div class="field-group">
+            <label>Log message (used if logs are enabled)</label>
+            <textarea id="p-log-message" rows="2" placeholder="{ticket.creator} closed ticket #{ticket.case}"></textarea>
+          </div>
+
+          <h3 class="section-heading">Display</h3>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Channel name format</label>
+              <input type="text" id="p-naming" value="{ticket.case}-{ticket.author.name}">
+            </div>
+            <div class="field-group">
+              <label>Case padding</label>
+              <input type="number" id="p-case-padding" value="0" min="0">
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Dropdown placeholder (if mode = dropdown)</label>
+            <input type="text" id="p-dropdown-placeholder" placeholder="Select a ticket type...">
+          </div>
+
+          <p style="font-size: 0.72rem; letter-spacing: 0.04em; color: var(--text-faint); margin: 24px 0 12px;">Live preview</p>
+          <div class="discord-preview-shell" style="max-width: 460px;">
+            <div class="discord-embed" id="panel-preview">
+              <div class="de-title" id="pp-title"></div>
+              <div class="de-desc" id="pp-desc"></div>
+            </div>
+            <button class="btn primary" id="pp-button" style="margin-top: 14px; width: 100%; pointer-events: none;"></button>
+          </div>
+        </div>
+
+        <!-- ============================================================ FORMS ============================================================ -->
+        <div class="ticket-tab-content" id="tab-forms" style="display:none;">
+          <p class="lead" style="margin-bottom: 20px;">Forms are reusable question sets - build one here, then attach it to an option in the Options tab.</p>
+          <div id="forms-list"></div>
+          <button class="btn secondary" id="add-form-btn" type="button">+ Add form</button>
+        </div>
+
+        <!-- ============================================================ OPTIONS ============================================================ -->
+        <div class="ticket-tab-content" id="tab-options" style="display:none;">
+          <p class="lead" style="margin-bottom: 20px;">Options are the ticket types members choose from. With one option, it's a single button; with two or more, a dropdown (or separate buttons).</p>
+          <div id="options-list"></div>
+          <button class="btn secondary" id="add-option-btn" type="button">+ Add option</button>
+        </div>
+
+        <div class="send-bar">
+          <div class="field-group" style="flex: 1; margin: 0;">
+            <label>Send panel to channel</label>
+            <select id="channel-select"></select>
+          </div>
+          <button class="btn primary" id="send-btn" style="align-self: flex-end;">Send Panel</button>
+        </div>
+        <p id="send-status" style="margin-top: 12px; font-size: 0.86rem;"></p>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span class="footer-brand">blaid.</span>
+        <div class="footer-links">
+          <a data-support-link href="#">Support Server</a>
+          <a href="docs.html">Documentation</a>
+          <a href="premium.html">Premium</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/tickets.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
