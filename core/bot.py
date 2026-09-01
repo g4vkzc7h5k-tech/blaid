@@ -127,10 +127,18 @@ class Blade(commands.Bot):
         if not self._status_writer.is_running():
             self._status_writer.start()
 
+        if not self._website_ticket_sync.is_running():
+            self._website_ticket_sync.start()
+
     @tasks.loop(seconds=60)
     async def _status_writer(self) -> None:
         from services.status_service import write_status
         await write_status(self)
+
+    @tasks.loop(seconds=30)
+    async def _website_ticket_sync(self) -> None:
+        from services.website_ticket_sync_service import poll_and_build
+        await poll_and_build(self)
 
     async def _load_guild_prefixes(self) -> None:
         from sqlalchemy import select
