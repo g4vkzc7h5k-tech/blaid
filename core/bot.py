@@ -130,7 +130,7 @@ class Blade(commands.Bot):
     @tasks.loop(seconds=60)
     async def _status_writer(self) -> None:
         from services.status_service import write_status
-        write_status(self)
+        await write_status(self)
 
     async def _load_guild_prefixes(self) -> None:
         from sqlalchemy import select
