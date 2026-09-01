@@ -2019,7 +2019,7 @@ class Utility(commands.Cog):
 
     @command_meta(
         category="Server",
-        description="Customizes the bot's name/avatar/banner/bio for this server only. Administrator only.",
+        description="Customize how the bot appears in this server.",
         syntax=",customize",
         examples=[],
         permissions=["Administrator"],
@@ -2054,7 +2054,7 @@ class Utility(commands.Cog):
 
     @command_meta(
         category="Server",
-        description="Sets the bot's nickname for this server. Run with no name to reset.",
+        description="Set the bot´s nickname in this server.",
         syntax=",customize name [name]",
         examples=[",customize name Blaid", ",customize name"],
         permissions=["Administrator"],
@@ -2077,7 +2077,7 @@ class Utility(commands.Cog):
 
     @command_meta(
         category="Server",
-        description="Sets the bot's avatar for this server only (a November 2025 Discord feature - see the note in ,customize help). Run with no image to reset.",
+        description="Set the bot´s server avatar (attach an image or pass a URL; omit to clear).",
         syntax=",customize avatar [image or url]",
         examples=[",customize avatar", ",customize avatar https://example.com/image.png"],
         permissions=["Administrator"],
@@ -2108,7 +2108,7 @@ class Utility(commands.Cog):
 
     @command_meta(
         category="Server",
-        description="Sets the bot's banner for this server only. Run with no image to reset.",
+        description="Set the bot´s server banner (attach an image or pass a URL; omit to clear).",
         syntax=",customize banner [image or url]",
         examples=[",customize banner", ",customize banner https://example.com/image.png"],
         permissions=["Administrator"],
@@ -2139,7 +2139,7 @@ class Utility(commands.Cog):
 
     @command_meta(
         category="Server",
-        description="Sets the bot's bio for this server only. Run with no text to reset.",
+        description="Set the bot´s About Me in this server (omit to clear).",
         syntax=",customize bio [bio]",
         examples=[",customize bio Your friendly server assistant.", ",customize bio"],
         permissions=["Administrator"],
@@ -2168,7 +2168,7 @@ class Utility(commands.Cog):
 
     @command_meta(
         category="Server",
-        description="Resets the bot's name, avatar, banner, and bio for this server.",
+        description="Reset all bot customization in this server.",
         syntax=",customize reset",
         examples=[",customize reset"],
         permissions=["Administrator"],
