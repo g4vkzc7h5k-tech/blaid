@@ -1,9 +1,9 @@
 /* ============================================================
    blaid. — design tokens
-   Near-black + deep wine red, Space Grotesk display / Inter body.
+   Near-black + deep wine red, Antonio display / Inter body.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   --bg: #0A0A0B;
@@ -20,7 +20,7 @@
   --text-muted: #9A989C;
   --text-faint: #616166;
 
-  --font-display: 'Space Grotesk', sans-serif;
+  --font-display: 'Antonio', sans-serif;
   --font-body: 'Inter', sans-serif;
 
   --radius: 10px;
@@ -406,7 +406,7 @@ body::before {
 
 .cmd-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-.cmd-name { font-family: 'Space Grotesk', monospace; font-weight: 600; font-size: 1.02rem; color: var(--text); }
+.cmd-name { font-family: 'Antonio', monospace; font-weight: 600; font-size: 1.02rem; color: var(--text); }
 
 .copy-btn {
   display: flex;
@@ -444,7 +444,7 @@ body::before {
   margin: 0 0 6px;
 }
 
-.cmd-meta-block .value { font-size: 0.86rem; color: var(--text-muted); font-family: 'Space Grotesk', monospace; }
+.cmd-meta-block .value { font-size: 0.86rem; color: var(--text-muted); font-family: 'Antonio', monospace; }
 .cmd-meta-block .value.perm { font-family: var(--font-body); color: var(--red-bright); }
 
 /* Scroll-reveal (one appearance per element, respects reduced motion).
@@ -601,7 +601,7 @@ body::before {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 16px;
-  font-family: 'Space Grotesk', monospace;
+  font-family: 'Antonio', monospace;
   font-size: 0.78rem;
   color: var(--text-muted);
   white-space: pre-wrap;
@@ -648,7 +648,40 @@ body::before {
 
 .premium-shell { max-width: 980px; margin: 0 auto; padding: 60px 24px 100px; text-align: center; }
 .premium-shell h1 { font-family: var(--font-display); font-size: 2.2rem; margin: 0 0 12px; }
-.premium-shell .lead { color: var(--text-muted); max-width: 560px; margin: 0 auto 48px; }
+.premium-shell .lead { color: var(--text-muted); max-width: 560px; margin: 0 auto 32px; }
+
+.how-to-get {
+  background: var(--bg-raised);
+  border: 1px solid var(--red);
+  box-shadow: 0 0 0 1px var(--red), 0 0 40px -10px rgba(139, 30, 47, 0.5);
+  border-radius: var(--radius);
+  padding: 28px 30px;
+  margin: 0 auto 48px;
+  max-width: 560px;
+  text-align: center;
+}
+
+.how-to-eyebrow {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--red-bright);
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.how-to-step { color: var(--text); font-size: 1rem; margin: 0 0 20px; }
+
+.how-to-code {
+  background: rgba(139, 30, 47, 0.18);
+  border: 1px solid var(--red);
+  color: var(--red-bright);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.how-to-btn { width: 100%; font-size: 1rem; padding: 15px 26px; }
 
 .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
 
@@ -736,4 +769,3 @@ body::before {
   .loader-mark { animation: none; }
   .page { transition: none; }
 }
-
