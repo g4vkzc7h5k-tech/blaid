@@ -1,9 +1,9 @@
 /* ============================================================
    blaid. — design tokens
-   Near-black + deep wine red, Antonio display / Inter body.
+   Near-black + deep wine red, Carlito (free Calibri-alike) display / Inter body.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   --bg: #0A0A0B;
@@ -20,7 +20,7 @@
   --text-muted: #9A989C;
   --text-faint: #616166;
 
-  --font-display: 'Antonio', sans-serif;
+  --font-display: 'Carlito', sans-serif;
   --font-body: 'Inter', sans-serif;
 
   --radius: 10px;
@@ -406,7 +406,7 @@ body::before {
 
 .cmd-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-.cmd-name { font-family: 'Antonio', monospace; font-weight: 600; font-size: 1.02rem; color: var(--text); }
+.cmd-name { font-family: 'Carlito', monospace; font-weight: 600; font-size: 1.02rem; color: var(--text); }
 
 .copy-btn {
   display: flex;
@@ -444,7 +444,7 @@ body::before {
   margin: 0 0 6px;
 }
 
-.cmd-meta-block .value { font-size: 0.86rem; color: var(--text-muted); font-family: 'Antonio', monospace; }
+.cmd-meta-block .value { font-size: 0.86rem; color: var(--text-muted); font-family: 'Carlito', monospace; }
 .cmd-meta-block .value.perm { font-family: var(--font-body); color: var(--red-bright); }
 
 /* Scroll-reveal (one appearance per element, respects reduced motion).
@@ -601,7 +601,7 @@ body::before {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 16px;
-  font-family: 'Antonio', monospace;
+  font-family: 'Carlito', monospace;
   font-size: 0.78rem;
   color: var(--text-muted);
   white-space: pre-wrap;
