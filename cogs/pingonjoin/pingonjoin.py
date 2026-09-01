@@ -16,6 +16,11 @@ from database.pingonjoin_models import DEFAULT_MESSAGE
 from repositories import pingonjoin_repository
 
 
+def _format_seconds(value: float) -> str:
+    """1.0 -> '1', 0.1 -> '0.1' - avoids showing '1.0s' for the common case."""
+    return f"{value:g}"
+
+
 class PingOnJoin(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -52,7 +57,7 @@ class PingOnJoin(commands.Cog):
         channel = ctx.guild.get_channel(cfg.channel_id)
         channel_display = channel.mention if channel else f"`{cfg.channel_id}` (deleted)"
         embed = discord.Embed(
-            description=f"{ctx.author.mention}: Pinging new members in {channel_display} (auto deletes after **{cfg.delete_after_seconds}s**)"
+            description=f"{ctx.author.mention}: Pinging new members in {channel_display} (auto deletes after **{_format_seconds(cfg.delete_after_seconds)}s**)"
         )
         await ctx.send(embed=embed)
 
@@ -94,20 +99,20 @@ class PingOnJoin(commands.Cog):
         category="Server",
         description="Ping new members in a channel.",
         syntax=",pingonjoin enable <channel> [seconds]",
-        examples=[",pingonjoin enable #welcome", ",pingonjoin enable #welcome 5"],
+        examples=[",pingonjoin enable #welcome", ",pingonjoin enable #welcome 0.1"],
         permissions=["Manage Guild"],
     )
     @pingonjoin.command(name="enable")
     @has_permission_or_fake("manage_guild")
-    async def pingonjoin_enable(self, ctx: commands.Context, channel: discord.TextChannel, seconds: int = 1):
-        seconds = max(1, seconds)
+    async def pingonjoin_enable(self, ctx: commands.Context, channel: discord.TextChannel, seconds: float = 1.0):
+        seconds = max(0.1, round(seconds, 1))
         async with get_session() as session:
             cfg = await pingonjoin_repository.get_or_create_config(session, ctx.guild.id)
             await pingonjoin_repository.update_config(
                 session, cfg, channel_id=channel.id, delete_after_seconds=seconds, enabled=True,
             )
 
-        await ctx.success(f"{ctx.author.mention}: New members will be pinged in {channel.mention} (deletes after **{seconds}s**)")
+        await ctx.success(f"{ctx.author.mention}: New members will be pinged in {channel.mention} (deletes after **{_format_seconds(seconds)}s**)")
 
     @command_meta(
         category="Server",
