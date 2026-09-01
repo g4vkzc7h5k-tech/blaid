@@ -765,7 +765,88 @@ body::before {
 
 .docs-mobile-trigger { display: none; }
 
+/* Deeper, softer card shadows for more visual separation */
+
+.cmd-card, .plan-card, .status-card, .discord-preview-shell, .how-to-get {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 10px 30px -18px rgba(0, 0, 0, 0.7);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cmd-card:hover {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 14px 36px -16px rgba(0, 0, 0, 0.75);
+  border-color: var(--text-faint);
+}
+
+.plan-card:hover { transform: translateY(-2px); }
+
+/* Skeleton loading state - used while /api/commands or /api/status
+   are still in flight, so the page never shows a bare loading string */
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--bg-raised) 25%, var(--bg-raised-2) 50%, var(--bg-raised) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 12px;
+  background: var(--bg-raised);
+}
+
+.skeleton-card .skeleton-line:first-child { width: 40%; margin-bottom: 14px; }
+.skeleton-card .skeleton-line:last-child { width: 85%; }
+
+/* Site footer - shared across every page */
+
+.site-footer {
+  border-top: 1px solid var(--border-soft);
+  padding: 36px 40px 40px;
+  margin-top: 60px;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--text-faint);
+  font-size: 0.86rem;
+  transition: color 0.15s ease;
+}
+
+.footer-links a:hover { color: var(--text-muted); }
+
 @media (prefers-reduced-motion: reduce) {
   .loader-mark { animation: none; }
   .page { transition: none; }
+  .skeleton-line { animation: none; }
 }
