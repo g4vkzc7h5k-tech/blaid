@@ -58,9 +58,6 @@ function initDotMenu() {
   });
 }
 
-// Mobile docs sidebar - a dedicated trigger button (shown only under
-// 860px, see CSS) opens the sidebar as a slide-in overlay, since the
-// desktop sidebar toggle is hidden entirely on small screens.
 function initDocsMobileNav() {
   const trigger = document.querySelector(".docs-mobile-trigger");
   const sidebar = document.querySelector(".docs-sidebar");
@@ -88,12 +85,7 @@ function initReveal() {
   const els = document.querySelectorAll(".reveal:not(.reveal-armed)");
   if (!els.length) return;
 
-  if (!("IntersectionObserver" in window)) {
-    // No IntersectionObserver support - leave elements in their
-    // default (visible) state rather than arming an animation that
-    // could never trigger.
-    return;
-  }
+  if (!("IntersectionObserver" in window)) return;
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -109,9 +101,6 @@ function initReveal() {
 
   els.forEach((el) => {
     el.classList.add("reveal-armed");
-    // Force a style flush so the browser registers the "armed" (hidden)
-    // state before the observer can immediately flip it to in-view on
-    // already-visible elements - otherwise the transition never plays.
     void el.offsetHeight;
     observer.observe(el);
   });
@@ -303,7 +292,44 @@ async function loadStatus() {
   }
 }
 
+// ---------------------------------------------------------- variables page
+
+async function loadVariables() {
+  const groupsEl = document.querySelector("#var-groups");
+  if (!groupsEl) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/variables`);
+    const data = await res.json();
+    groupsEl.innerHTML = Object.entries(data.groups)
+      .map(
+        ([group, vars]) => `
+          <h2>${group}</h2>
+          ${vars
+            .map(
+              (v) => `
+            <div class="cmd-card reveal">
+              <span class="cmd-name">${v.name}</span>
+              <p class="cmd-desc">${v.description} — e.g. <code>${v.example}</code></p>
+            </div>
+          `
+            )
+            .join("")}
+        `
+      )
+      .join("");
+    initReveal();
+  } catch (err) {
+    groupsEl.innerHTML = `<p style="color: var(--text-faint);">Couldn't reach the API.</p>`;
+  }
+}
+
 // ---------------------------------------------------------- embed builder
+//
+// Builds Blade's own script syntax (see core/script_parser.py), NOT raw
+// Discord embed JSON - e.g. {embed}$v{title: Hi {user.mention}}$v...
+// so the output can be pasted directly into any Blade command that
+// accepts a custom script (,tickets message, ,joindm message, etc.).
 
 function initEmbedBuilder() {
   const preview = document.querySelector("#preview");
@@ -323,6 +349,34 @@ function initEmbedBuilder() {
     } else {
       el.style.display = "none";
     }
+  }
+
+  function buildScript(v, isValidColor) {
+    const parts = ["{embed}"];
+
+    if (v.title) parts.push(`{title: ${v.title}}`);
+    if (v.desc) parts.push(`{description: ${v.desc}}`);
+    if (isValidColor) parts.push(`{color: ${v.color}}`);
+    if (v.thumb) parts.push(`{thumbnail: ${v.thumb}}`);
+    if (v.image) parts.push(`{image: ${v.image}}`);
+
+    if (v["author-name"]) {
+      let authorPart = `name:${v["author-name"]}`;
+      if (v["author-icon"]) authorPart += ` && icon:${v["author-icon"]}`;
+      parts.push(`{author: ${authorPart}}`);
+    }
+
+    if (v["field-name"] || v["field-value"]) {
+      parts.push(`{field: ${v["field-name"] || "\u200b"} && ${v["field-value"] || "\u200b"}}`);
+    }
+
+    if (v.footer || v["footer-icon"]) {
+      let footerPart = v.footer || "";
+      if (v["footer-icon"]) footerPart += ` && ${v["footer-icon"]}`;
+      parts.push(`{footer: ${footerPart}}`);
+    }
+
+    return parts.join("$v");
   }
 
   function update() {
@@ -367,17 +421,7 @@ function initEmbedBuilder() {
     preview.style.borderLeftColor = isValidColor ? v.color : "var(--red)";
     if (isValidColor) colorPicker.value = v.color;
 
-    const payload = {
-      title: v.title || null,
-      description: v.desc || null,
-      color: isValidColor ? parseInt(v.color.replace("#", ""), 16) : null,
-      thumbnail: v.thumb ? { url: v.thumb } : null,
-      image: v.image ? { url: v.image } : null,
-      author: v["author-name"] ? { name: v["author-name"], icon_url: v["author-icon"] || null } : null,
-      footer: v.footer || v["footer-icon"] ? { text: v.footer || null, icon_url: v["footer-icon"] || null } : null,
-      fields: v["field-name"] || v["field-value"] ? [{ name: v["field-name"], value: v["field-value"], inline: false }] : [],
-    };
-    document.getElementById("json-output").textContent = JSON.stringify(payload, null, 2);
+    document.getElementById("json-output").textContent = buildScript(v, isValidColor);
   }
 
   Object.values(fields).forEach((f) => f.addEventListener("input", update));
@@ -396,38 +440,6 @@ function initEmbedBuilder() {
   });
 }
 
-// ---------------------------------------------------------- variables page
-
-async function loadVariables() {
-  const groupsEl = document.querySelector("#var-groups");
-  if (!groupsEl) return;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/variables`);
-    const data = await res.json();
-    groupsEl.innerHTML = Object.entries(data.groups)
-      .map(
-        ([group, vars]) => `
-          <h2>${group}</h2>
-          ${vars
-            .map(
-              (v) => `
-            <div class="cmd-card reveal">
-              <span class="cmd-name">${v.name}</span>
-              <p class="cmd-desc">${v.description} — e.g. <code>${v.example}</code></p>
-            </div>
-          `
-            )
-            .join("")}
-        `
-      )
-      .join("");
-    initReveal();
-  } catch (err) {
-    groupsEl.innerHTML = `<p style="color: var(--text-faint);">Couldn't reach the API.</p>`;
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   initLoader();
   initTopMenu();
@@ -439,8 +451,4 @@ document.addEventListener("DOMContentLoaded", () => {
   loadStatus();
   initEmbedBuilder();
   loadVariables();
-  if (document.querySelector("#status-line")) {
-    setInterval(loadStatus, 30000);
-  }
 });
-
