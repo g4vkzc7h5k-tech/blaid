@@ -51,6 +51,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 STATUS_REPORT_TOKEN = os.environ.get("STATUS_REPORT_TOKEN", "")
+BOT_API_TOKEN = os.environ.get("BOT_API_TOKEN", "")  # shared secret for bot<->backend calls (tickets queue)
+BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN", "")  # bot's real Discord token - only used for read-only REST calls (listing channels)
+DISCORD_CLIENT_ID = os.environ.get("DISCORD_CLIENT_ID", "")
+DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET", "")
+OAUTH_REDIRECT_URI = os.environ.get("OAUTH_REDIRECT_URI", "")  # e.g. https://blaid.onrender.com/api/auth/callback
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "")  # e.g. https://blaid.best - where to redirect after login
 
 app = FastAPI(title="Blaid API")
 
@@ -240,6 +246,7 @@ class StatusReport(BaseModel):
     user_count: int
     latency_ms: int | None = None
     started_at: float
+    guild_ids: list[int] = []
 
 
 @app.post("/api/status/report")
@@ -255,6 +262,7 @@ def report_status(report: StatusReport, x_status_token: str = Header(default="")
         "latency_ms": report.latency_ms,
         "started_at": report.started_at,
         "updated_at": time.time(),
+        "guild_ids": report.guild_ids,
     }
     return {"ok": True}
 
@@ -270,6 +278,374 @@ def status():
         return {"online": False, "reason": "Status data is stale."}
 
     return _last_status
+
+
+# ============================================================
+# Discord OAuth login - lets the website know who's asking and which
+# servers they can manage, so the ticket builder can offer a real
+# "send to my server" flow.
+#
+# Session storage is in-memory (a dict keyed by a random token set as
+# an httponly cookie) - fine for a single Render instance; sessions
+# reset on redeploy, which just means logging in again, nothing lost.
+# ============================================================
+
+import secrets
+import time as _time
+
+import aiohttp
+from fastapi import Cookie, Request
+from fastapi.responses import RedirectResponse
+
+DISCORD_API = "https://discord.com/api/v10"
+ADMINISTRATOR = 0x8
+MANAGE_GUILD = 0x20
+
+_sessions: dict[str, dict] = {}  # session_token -> {user, guild_ids_admin, expires_at}
+SESSION_TTL = 60 * 60 * 24 * 7  # 7 days
+
+
+def _get_session(session_token: str | None) -> dict | None:
+    if not session_token:
+        return None
+    session = _sessions.get(session_token)
+    if session is None:
+        return None
+    if session["expires_at"] < _time.time():
+        _sessions.pop(session_token, None)
+        return None
+    return session
+
+
+@app.get("/api/auth/login")
+def auth_login():
+    if not DISCORD_CLIENT_ID or not OAUTH_REDIRECT_URI:
+        raise HTTPException(status_code=500, detail="OAuth is not configured on this backend.")
+    params = (
+        f"client_id={DISCORD_CLIENT_ID}"
+        f"&redirect_uri={OAUTH_REDIRECT_URI}"
+        "&response_type=code"
+        "&scope=identify%20guilds"
+    )
+    return RedirectResponse(f"https://discord.com/oauth2/authorize?{params}")
+
+
+@app.get("/api/auth/callback")
+async def auth_callback(code: str):
+    if not DISCORD_CLIENT_SECRET:
+        raise HTTPException(status_code=500, detail="OAuth is not configured on this backend.")
+
+    async with aiohttp.ClientSession() as http:
+        token_resp = await http.post(
+            f"{DISCORD_API}/oauth2/token",
+            data={
+                "client_id": DISCORD_CLIENT_ID,
+                "client_secret": DISCORD_CLIENT_SECRET,
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": OAUTH_REDIRECT_URI,
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        if token_resp.status != 200:
+            raise HTTPException(status_code=400, detail="Discord rejected the login.")
+        token_data = await token_resp.json()
+        access_token = token_data["access_token"]
+
+        auth_header = {"Authorization": f"Bearer {access_token}"}
+        user_resp = await http.get(f"{DISCORD_API}/users/@me", headers=auth_header)
+        user = await user_resp.json()
+
+        guilds_resp = await http.get(f"{DISCORD_API}/users/@me/guilds", headers=auth_header)
+        guilds = await guilds_resp.json()
+
+    # Only guilds where this user has real management permissions -
+    # the bot's own presence in the guild is checked separately at
+    # request time against its live guild list, not cached here.
+    admin_guilds = [
+        {"id": g["id"], "name": g["name"], "icon": g.get("icon")}
+        for g in guilds
+        if (int(g.get("permissions", 0)) & (ADMINISTRATOR | MANAGE_GUILD))
+    ]
+
+    session_token = secrets.token_urlsafe(32)
+    _sessions[session_token] = {
+        "user": {"id": user["id"], "username": user["username"], "avatar": user.get("avatar")},
+        "admin_guilds": admin_guilds,
+        "expires_at": _time.time() + SESSION_TTL,
+    }
+
+    redirect_target = f"{FRONTEND_URL.rstrip('/')}/tickets.html" if FRONTEND_URL else "/"
+    response = RedirectResponse(redirect_target)
+    response.set_cookie(
+        "blaid_session", session_token, httponly=True, samesite="lax", secure=True, max_age=SESSION_TTL,
+    )
+    return response
+
+
+@app.post("/api/auth/logout")
+def auth_logout(blaid_session: str | None = Cookie(default=None)):
+    if blaid_session:
+        _sessions.pop(blaid_session, None)
+    response = RedirectResponse("/")
+    response.delete_cookie("blaid_session")
+    return response
+
+
+@app.get("/api/auth/me")
+def auth_me(blaid_session: str | None = Cookie(default=None)):
+    session = _get_session(blaid_session)
+    if session is None:
+        return {"logged_in": False}
+
+    bot_guild_ids = set(str(g) for g in (_last_status or {}).get("guild_ids", []))
+    manageable = [g for g in session["admin_guilds"] if g["id"] in bot_guild_ids]
+
+    return {
+        "logged_in": True,
+        "user": session["user"],
+        "guilds": manageable,
+    }
+
+
+@app.get("/api/guilds/{guild_id}/channels")
+async def guild_channels(guild_id: str, blaid_session: str | None = Cookie(default=None)):
+    session = _get_session(blaid_session)
+    manageable_ids = {g["id"] for g in session["admin_guilds"]} if session else set()
+    if session is None or guild_id not in manageable_ids:
+        raise HTTPException(status_code=403, detail="You don't manage this server.")
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=500, detail="Bot token not configured on this backend.")
+
+    async with aiohttp.ClientSession() as http:
+        resp = await http.get(
+            f"{DISCORD_API}/guilds/{guild_id}/channels",
+            headers={"Authorization": f"Bot {BOT_TOKEN}"},
+        )
+        if resp.status != 200:
+            raise HTTPException(status_code=502, detail="Couldn't fetch channels from Discord.")
+        channels = await resp.json()
+
+    text_channels = [
+        {"id": c["id"], "name": c["name"]}
+        for c in channels
+        if c.get("type") == 0  # GUILD_TEXT
+    ]
+    return {"channels": text_channels}
+
+
+@app.get("/api/guilds/{guild_id}/categories")
+async def guild_categories(guild_id: str, blaid_session: str | None = Cookie(default=None)):
+    session = _get_session(blaid_session)
+    manageable_ids = {g["id"] for g in session["admin_guilds"]} if session else set()
+    if session is None or guild_id not in manageable_ids:
+        raise HTTPException(status_code=403, detail="You don't manage this server.")
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=500, detail="Bot token not configured on this backend.")
+
+    async with aiohttp.ClientSession() as http:
+        resp = await http.get(
+            f"{DISCORD_API}/guilds/{guild_id}/channels",
+            headers={"Authorization": f"Bot {BOT_TOKEN}"},
+        )
+        if resp.status != 200:
+            raise HTTPException(status_code=502, detail="Couldn't fetch categories from Discord.")
+        channels = await resp.json()
+
+    categories = [
+        {"id": c["id"], "name": c["name"]}
+        for c in channels
+        if c.get("type") == 4  # GUILD_CATEGORY
+    ]
+    return {"categories": categories}
+
+
+@app.get("/api/guilds/{guild_id}/roles")
+async def guild_roles(guild_id: str, blaid_session: str | None = Cookie(default=None)):
+    session = _get_session(blaid_session)
+    manageable_ids = {g["id"] for g in session["admin_guilds"]} if session else set()
+    if session is None or guild_id not in manageable_ids:
+        raise HTTPException(status_code=403, detail="You don't manage this server.")
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=500, detail="Bot token not configured on this backend.")
+
+    async with aiohttp.ClientSession() as http:
+        resp = await http.get(
+            f"{DISCORD_API}/guilds/{guild_id}/roles",
+            headers={"Authorization": f"Bot {BOT_TOKEN}"},
+        )
+        if resp.status != 200:
+            raise HTTPException(status_code=502, detail="Couldn't fetch roles from Discord.")
+        roles = await resp.json()
+
+    roles = [{"id": r["id"], "name": r["name"]} for r in roles if r["name"] != "@everyone"]
+    return {"roles": roles}
+
+
+# ============================================================
+# Ticket panel queue - the website submits a build request here; the
+# bot polls /api/tickets/pending on an interval and creates the panel
+# itself (reusing its own ticket_panel_manager_service), then reports
+# back /complete. This indirection exists because the website backend
+# and the bot run on different hosts and can't share a database or
+# filesystem directly.
+# ============================================================
+
+# --- Ticket data model - mirrors database/tickets_models.py,
+# database/ticket_options_models.py, and database/ticket_forms_models.py
+# field-for-field, so the bot's poller can apply this directly via the
+# real repositories with no translation layer.
+
+class TicketPanelSettings(BaseModel):
+    # Basics
+    title: str
+    description: str = ""
+    button_label: str = "Open Ticket"
+
+    # Category (channels/categories - all optional, resolved by the bot)
+    channel_id: str  # where the panel itself is posted (also the "send to" channel)
+    log_channel_id: str | None = None
+    category_id: str | None = None
+    closed_category_id: str | None = None
+
+    # Behaviour
+    delete_delay_seconds: int = 0
+    max_open_tickets: int = 1
+    auto_pin_controls: bool = False
+    claims_enabled: bool = True
+    logs_enabled: bool = False
+    log_message_template: str | None = None
+
+    # Display
+    channel_name_format: str = "{ticket.case}-{ticket.author.name}"
+    case_padding: int = 0
+    dropdown_placeholder: str | None = None
+    mode: str = "dropdown"  # "dropdown" | "buttons"
+
+
+class TicketButtonConfig(BaseModel):
+    label: str
+    emoji: str | None = None
+    color: str = "gray"  # blue|gray|green|red
+    requires_reason: bool = False
+
+
+class TicketOptionSettings(BaseModel):
+    # Basics (Create Option + Style)
+    name: str
+    label: str
+    emoji: str | None = None
+    button_style: str = "blue"
+    button_description: str | None = None
+
+    # Behavior > Categories
+    default_category_id: str | None = None
+    claim_category_id: str | None = None
+    close_category_id: str | None = None
+    transcript_channel_id: str | None = None
+
+    # Behavior > Naming
+    channel_name_format: str = "{ticket.case}-{ticket.author.name}"
+    claim_rename_template: str | None = None
+    close_rename_template: str | None = None
+
+    # Behavior > Permissions
+    creator_can_close: bool = True
+    close_on_leave: bool = False
+
+    # Behavior > Required Roles
+    require_all_roles: bool = False
+    required_role_ids: list[str] = []
+
+    # Behavior > Support Roles
+    keep_staff_visible_on_claim: bool = True
+    staff_can_speak_on_claim: bool = True
+    support_role_ids: list[str] = []
+
+    # Behavior > Trainee Roles
+    trainees_can_claim: bool = False
+    trainees_can_close: bool = False
+    trainees_can_speak: bool = False
+    trainee_role_ids: list[str] = []
+
+    # Behavior > Button UX (claim/close/reopen/delete)
+    button_configs: dict[str, TicketButtonConfig] = {}
+
+    # Form (references a form built in the Forms tab, by its temp key - see TicketBuildRequest)
+    form_key: str | None = None
+
+    # Messages (message_type -> content)
+    messages: dict[str, str] = {}
+
+    # Automation (minutes)
+    auto_close_timer: int | None = None
+    auto_delete_timer: int | None = None
+    inactivity_timer: int | None = None
+
+
+class TicketFormField(BaseModel):
+    field_type: str  # short_text|long_text|checkbox|select|role_select|user_select|channel_select
+    label: str
+    description: str | None = None
+    key: str | None = None
+    required: bool = True
+
+
+class TicketFormSettings(BaseModel):
+    key: str  # temporary client-side key, so options can reference "which form" before either has a real DB id
+    name: str
+    modal_title: str
+    enable_filtering: bool = False
+    fields: list[TicketFormField] = []
+
+
+class TicketBuildRequest(BaseModel):
+    guild_id: str
+    panel: TicketPanelSettings
+    options: list[TicketOptionSettings] = []
+    forms: list[TicketFormSettings] = []
+
+
+_ticket_queue: dict[str, dict] = {}  # id -> {status, request, created_at}
+
+
+@app.post("/api/tickets/queue")
+def queue_ticket_panel(payload: TicketBuildRequest, blaid_session: str | None = Cookie(default=None)):
+    session = _get_session(blaid_session)
+    manageable_ids = {g["id"] for g in session["admin_guilds"]} if session else set()
+    if session is None or payload.guild_id not in manageable_ids:
+        raise HTTPException(status_code=403, detail="You don't manage this server.")
+
+    item_id = secrets.token_hex(8)
+    _ticket_queue[item_id] = {
+        "id": item_id,
+        "status": "pending",
+        "request": payload.model_dump(),
+        "created_at": time.time(),
+    }
+    return {"ok": True, "id": item_id}
+
+
+def _require_bot_auth(x_bot_token: str = Header(default="")) -> None:
+    if not BOT_API_TOKEN or x_bot_token != BOT_API_TOKEN:
+        raise HTTPException(status_code=401, detail="Invalid or missing bot token.")
+
+
+@app.get("/api/tickets/pending")
+def get_pending_tickets(x_bot_token: str = Header(default="")):
+    _require_bot_auth(x_bot_token)
+    pending = [item for item in _ticket_queue.values() if item["status"] == "pending"]
+    return {"items": pending}
+
+
+@app.post("/api/tickets/pending/{item_id}/complete")
+def complete_pending_ticket(item_id: str, x_bot_token: str = Header(default="")):
+    _require_bot_auth(x_bot_token)
+    item = _ticket_queue.get(item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Not found")
+    item["status"] = "done"
+    return {"ok": True}
 
 
 if __name__ == "__main__":
