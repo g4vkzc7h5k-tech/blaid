@@ -47,6 +47,8 @@ class Config:
     support_server_url: str = field(default_factory=lambda: os.getenv("SUPPORT_SERVER_URL", ""))
     invite_url: str = field(default_factory=lambda: os.getenv("INVITE_URL", ""))
     topgg_vote_url: str = field(default_factory=lambda: os.getenv("TOPGG_VOTE_URL", ""))
+    website_api_url: str = field(default_factory=lambda: os.getenv("WEBSITE_API_URL", ""))
+    status_report_token: str = field(default_factory=lambda: os.getenv("STATUS_REPORT_TOKEN", ""))
 
     # --- Behaviour ---
     owner_ids: list[int] = field(
