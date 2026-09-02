@@ -51,6 +51,7 @@ INITIAL_COGS = [
     "cogs.badge.badge",
     "cogs.commandtoggle.commandtoggle",
     "cogs.avatarfx.avatarfx",
+    "cogs.invoke.invoke",
 ]
 
 
