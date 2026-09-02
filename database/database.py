@@ -65,6 +65,7 @@ from database import vanity_models  # noqa: F401  VanityConfig, VanityRole, Vani
 from database import badge_models  # noqa: F401  BadgeConfig, BadgeRole, BadgeAwarded
 from database import command_toggle_models  # noqa: F401  DisabledCommand
 from database import invoke_models  # noqa: F401  InvokeMessage
+from database import bumpreminder_models  # noqa: F401  BumpReminderConfig, BumpLeaderboardEntry
 
 log = logging.getLogger("blade.database")
 
