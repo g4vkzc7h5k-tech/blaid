@@ -104,6 +104,13 @@ _PUNISHMENT_VERBS = {
     "unbanned": "unbanned from", "unjailed": "unjailed in", "untimedout": "had your timeout removed in",
 }
 
+# Maps send_punishment_dm's past-tense `action` values to ,invoke's
+# command-name keys (database/invoke_models.VALID_COMMANDS).
+_ACTION_TO_INVOKE_COMMAND = {
+    "jailed": "jail", "banned": "ban", "timedout": "timeout",
+    "unbanned": "unban", "unjailed": "unjail", "untimedout": "untimeout",
+}
+
 
 async def send_punishment_dm(
     member_or_user, guild: discord.Guild, action: str, moderator, reason: str | None = None,
@@ -111,7 +118,39 @@ async def send_punishment_dm(
 ) -> bool:
     """Red embed DM for ban/timeout/jail and their reversals - best
     effort, never raises. action is one of: jailed, banned, timedout,
-    unbanned, unjailed, untimedout."""
+    unbanned, unjailed, untimedout.
+
+    Checks ,invoke first for a server-specific custom "dm" message for
+    the matching command; falls back to the built-in embed if none is
+    configured."""
+    from core.script_parser import parse_script
+    from core.variables import resolve_variables
+    from repositories import invoke_repository
+
+    invoke_command = _ACTION_TO_INVOKE_COMMAND.get(action)
+    custom_content = None
+    if invoke_command is not None:
+        async with get_session() as session:
+            custom_content = await invoke_repository.get_message(session, guild.id, invoke_command, "dm")
+
+    if custom_content:
+        resolved = resolve_variables(
+            custom_content, guild=guild, member=member_or_user, reason=reason or "No reason provided",
+        )
+        resolved = resolved.replace("{moderator.mention}", getattr(moderator, "mention", str(moderator)))
+        resolved = resolved.replace("{moderator.name}", getattr(moderator, "name", str(moderator)))
+        resolved = resolved.replace("{moderator.id}", str(getattr(moderator, "id", "")))
+        resolved = resolved.replace("{duration}", duration or "N/A")
+        parsed = parse_script(resolved)
+        try:
+            if parsed.embed is not None:
+                await member_or_user.send(content=parsed.content, embed=parsed.embed)
+            else:
+                await member_or_user.send(resolved)
+            return True
+        except discord.HTTPException:
+            return False
+
     title = _PUNISHMENT_TITLES.get(action, action.title())
     verb = _PUNISHMENT_VERBS.get(action, action)
 
