@@ -587,7 +587,8 @@ class Moderation(commands.Cog):
             target_id=member.id, target_mention=member.mention, reason=reason,
         )
         await moderation_service.try_dm(member, f"You were warned in **{ctx.guild.name}**.\nReason: {reason}")
-        await ctx.success(f"Warned **{member}**.\nReason: {reason}")
+        custom_text = await moderation_service.get_invoke_text(ctx.guild.id, "warn", guild=ctx.guild, member=member, reason=reason)
+        await ctx.success(custom_text or f"Warned **{member}**.\nReason: {reason}")
 
         async with get_session() as session:
             count = await moderation_repository.get_active_warning_count(session, ctx.guild.id, member.id)
