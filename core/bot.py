@@ -52,6 +52,7 @@ INITIAL_COGS = [
     "cogs.commandtoggle.commandtoggle",
     "cogs.avatarfx.avatarfx",
     "cogs.invoke.invoke",
+    "cogs.bumpreminder.bumpreminder",
 ]
 
 
