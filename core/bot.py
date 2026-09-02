@@ -50,6 +50,7 @@ INITIAL_COGS = [
     "cogs.vanity.vanity",
     "cogs.badge.badge",
     "cogs.commandtoggle.commandtoggle",
+    "cogs.avatarfx.avatarfx",
 ]
 
 
