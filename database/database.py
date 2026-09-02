@@ -64,6 +64,7 @@ from database import joindm_models  # noqa: F401  JoinDmConfig
 from database import vanity_models  # noqa: F401  VanityConfig, VanityRole, VanityAwarded
 from database import badge_models  # noqa: F401  BadgeConfig, BadgeRole, BadgeAwarded
 from database import command_toggle_models  # noqa: F401  DisabledCommand
+from database import invoke_models  # noqa: F401  InvokeMessage
 
 log = logging.getLogger("blade.database")
 
