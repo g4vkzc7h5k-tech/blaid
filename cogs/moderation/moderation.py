@@ -806,7 +806,8 @@ class Moderation(commands.Cog):
             ctx.guild, "untimeout", ctx.author,
             target_id=member.id, target_mention=member.mention, reason=reason,
         )
-        await ctx.success(f"Removed timeout from **{member}**.")
+        custom_text = await moderation_service.get_invoke_text(ctx.guild.id, "untimeout", guild=ctx.guild, member=member, reason=reason)
+        await ctx.success(custom_text or f"Removed timeout from **{member}**.")
 
     # ---------------------------------------------------------- jail / unjail
 
