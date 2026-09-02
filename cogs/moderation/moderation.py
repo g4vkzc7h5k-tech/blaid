@@ -878,8 +878,9 @@ class Moderation(commands.Cog):
         else:
             time_display = "**Indefinite**"
 
+        custom_text = await moderation_service.get_invoke_text(ctx.guild.id, "jail", guild=ctx.guild, member=member, reason=reason)
         embed = discord.Embed(
-            description=f"{ctx.author.mention}: **{member}** is now jailed for {time_display}",
+            description=custom_text or f"{ctx.author.mention}: **{member}** is now jailed for {time_display}",
             color=discord.Color.red(),
         )
         await ctx.send(embed=embed)
