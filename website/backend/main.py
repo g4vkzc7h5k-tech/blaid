@@ -335,20 +335,25 @@ async def auth_callback(code: str):
     if not DISCORD_CLIENT_SECRET:
         raise HTTPException(status_code=500, detail="OAuth is not configured on this backend.")
 
+    from urllib.parse import urlencode
+
+    token_body = urlencode({
+        "client_id": DISCORD_CLIENT_ID,
+        "client_secret": DISCORD_CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": OAUTH_REDIRECT_URI,
+    })
+
     async with aiohttp.ClientSession() as http:
         token_resp = await http.post(
             f"{DISCORD_API}/oauth2/token",
-            data={
-                "client_id": DISCORD_CLIENT_ID,
-                "client_secret": DISCORD_CLIENT_SECRET,
-                "grant_type": "authorization_code",
-                "code": code,
-                "redirect_uri": OAUTH_REDIRECT_URI,
-            },
+            data=token_body,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         if token_resp.status != 200:
-            raise HTTPException(status_code=400, detail="Discord rejected the login.")
+            error_body = await token_resp.text()
+            raise HTTPException(status_code=400, detail=f"Discord rejected the login: {error_body}")
         token_data = await token_resp.json()
         access_token = token_data["access_token"]
 
