@@ -1984,6 +1984,52 @@ class Utility(commands.Cog):
         embed = discord.Embed(title="Reverse Image Search", description=description, color=color)
         await ctx.send(embed=embed)
 
+
+# ---------------------------------------------------------- img2gif
+
+    @command_meta(
+        category="Utility",
+        description="Convert an image to a GIF.",
+        syntax=",img2gif [url]",
+        examples=[",img2gif https://example.com/image.png", ",img2gif (with an attached image)"],
+        require_args=False,
+    )
+    @commands.command(name="img2gif", with_app_command=False)
+    async def img2gif(self, ctx: commands.Context, url: str = None):
+        import io
+
+        import aiohttp
+        from PIL import Image
+
+        image_bytes = None
+
+        if ctx.message.attachments:
+            image_bytes = await ctx.message.attachments[0].read()
+        elif url:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                        if resp.status == 200:
+                            image_bytes = await resp.read()
+            except (aiohttp.ClientError, TimeoutError):
+                image_bytes = None
+
+        if image_bytes is None:
+            await ctx.error("Provide an image URL or attach an image.")
+            return
+
+        try:
+            img = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+        except Exception:
+            await ctx.error("That doesn't look like a valid image.")
+            return
+
+        buffer = io.BytesIO()
+        img.save(buffer, format="GIF")
+        buffer.seek(0)
+
+        await ctx.send(file=discord.File(buffer, filename="converted.gif"))
+
     # ---------------------------------------------------------- pin
 
     @command_meta(
