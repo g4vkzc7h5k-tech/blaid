@@ -556,7 +556,8 @@ class Moderation(commands.Cog):
             ctx.guild, "kick", ctx.author,
             target_id=member.id, target_mention=member.mention, reason=reason,
         )
-        await ctx.success(f"Kicked **{member}**.\nReason: {reason}")
+        custom_text = await moderation_service.get_invoke_text(ctx.guild.id, "kick", guild=ctx.guild, member=member, reason=reason)
+        await ctx.success(custom_text or f"Kicked **{member}**.\nReason: {reason}")
 
     # ---------------------------------------------------------- warn
 
