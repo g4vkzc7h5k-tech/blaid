@@ -250,8 +250,9 @@ class Moderation(commands.Cog):
             target_id=member.id, target_mention=member.mention, reason=reason,
         )
 
+        custom_text = await moderation_service.get_invoke_text(ctx.guild.id, "softban", guild=ctx.guild, member=member, reason=reason)
         embed = discord.Embed(
-            description=f"{ctx.author.mention}: **{member}** has been softbanned.",
+            description=custom_text or f"{ctx.author.mention}: **{member}** has been softbanned.",
             color=discord.Color.red(),
         )
         await ctx.send(embed=embed)
