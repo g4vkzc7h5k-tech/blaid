@@ -785,7 +785,8 @@ class Moderation(commands.Cog):
             ctx.guild, "timeout", ctx.author,
             target_id=member.id, target_mention=member.mention, reason=reason, duration_seconds=duration,
         )
-        await ctx.success(f"Timed out **{member}** for `{format_duration(duration)}`.\nReason: {reason}")
+        custom_text = await moderation_service.get_invoke_text(ctx.guild.id, "timeout", guild=ctx.guild, member=member, reason=reason)
+        await ctx.success(custom_text or f"Timed out **{member}** for `{format_duration(duration)}`.\nReason: {reason}")
 
     @command_meta(
         category="Moderation",
