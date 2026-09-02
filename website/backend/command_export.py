@@ -15,15 +15,16 @@ run at class-definition time, which is import time). This is the
 mechanism that keeps the website's docs from ever drifting out of
 sync with the real bot: the website reads the same registry the bot's
 ,help command reads, never a hand-maintained copy.
-"""
 
-from __future__ import annotations
+IMPORTANT: every new cog module must be added to COG_MODULES below,
+or the website's Commands page will simply never see its commands -
+this list is the one place that has to be kept in sync manually.
+"""
 
 import json
 import os
 import sys
 
-# Make the project root (two levels up from this file) importable.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 COG_MODULES = [
@@ -32,6 +33,7 @@ COG_MODULES = [
     "cogs.automod.automod",
     "cogs.autopfp.autopfp",
     "cogs.autoreact.autoreact",
+    "cogs.avatarfx.avatarfx",
     "cogs.backup.backup",
     "cogs.badge.badge",
     "cogs.boost.boost",
