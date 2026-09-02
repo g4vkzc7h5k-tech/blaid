@@ -382,11 +382,11 @@ body::before {
 
 .cmd-body { max-width: 1000px; margin: 0 auto; padding: 24px 24px 100px; }
 
-.cmd-body.tab-out { opacity: 0; transform: translateX(-8px); }
-.cmd-body.tab-in { animation: tab-slide-in 0.22s ease; }
+.cmd-body.tab-out { opacity: 0; transform: translateX(-40px); transition: opacity 0.18s ease, transform 0.18s ease; }
+.cmd-body.tab-in { animation: tab-slide-in 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
 
 @keyframes tab-slide-in {
-  from { opacity: 0; transform: translateX(8px); }
+  from { opacity: 0; transform: translateX(40px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
@@ -480,6 +480,36 @@ body::before {
   background: rgba(10, 10, 11, 0.97);
   border-bottom: 1px solid var(--border-soft);
   padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.chip-bar-wrap .chip-bar { margin: 0; flex: 1; }
+
+.chip-arrow {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.chip-arrow:hover { color: var(--text); border-color: var(--red); background: rgba(139, 30, 47, 0.1); }
+.chip-arrow svg { width: 16px; height: 16px; }
+.chip-arrow:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+@media (min-width: 861px) {
+  .chip-arrow { display: flex; }
 }
 
 @media (min-width: 861px) {
