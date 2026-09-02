@@ -172,6 +172,25 @@ async def send_punishment_dm(
         return False
 
 
+async def get_invoke_text(guild_id: int, command: str, **kwargs) -> str | None:
+    """Looks up a server-specific custom "text" (channel) message for
+    ,invoke - returns the fully resolved string, or None if nothing is
+    configured for that command (caller should fall back to its own
+    default message). kwargs are passed straight to resolve_variables
+    (guild, member, reason, etc.) - pass whatever that command has on
+    hand."""
+    from core.variables import resolve_variables
+    from repositories import invoke_repository
+
+    async with get_session() as session:
+        content = await invoke_repository.get_message(session, guild_id, command, "text")
+
+    if not content:
+        return None
+
+    return resolve_variables(content, **kwargs)
+
+
 async def get_case_history(guild_id: int, user_id: int) -> list[ModerationCase]:
     async with get_session() as session:
         return await moderation_repository.get_cases_for_user(session, guild_id, user_id)
