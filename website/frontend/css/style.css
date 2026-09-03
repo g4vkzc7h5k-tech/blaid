@@ -847,6 +847,75 @@ select {
 
 select:focus { border-color: var(--red); }
 
+/* User chip (login status, top-right of ticket builder) */
+
+.user-chip-wrap {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px 6px 6px;
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.user-chip:hover { border-color: var(--red); }
+
+.user-chip-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-chip-caret { width: 14px; height: 14px; color: var(--text-faint); }
+
+.user-chip-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  min-width: 140px;
+  padding: 6px;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 20;
+}
+
+.user-chip-menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+.user-chip-menu button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--red-bright);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.user-chip-menu button:hover { background: rgba(30, 107, 139, 0.14); }
+
 /* Ticket builder - entity cards (forms, options) */
 
 .section-heading {
