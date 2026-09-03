@@ -81,11 +81,17 @@ function initDocsMobileNav() {
   sidebar.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
 }
 
+const _isMobile = window.matchMedia("(max-width: 860px)").matches;
+
 function initReveal() {
   const els = document.querySelectorAll(".reveal:not(.reveal-armed)");
   if (!els.length) return;
 
-  if (!("IntersectionObserver" in window)) return;
+  // On mobile, per-card scroll-reveal (many IntersectionObserver
+  // targets + forced reflows) was the likely cause of "a problem
+  // occurred" tab crashes on long lists like Commands - cards just
+  // show immediately there instead. Desktop keeps the animation.
+  if (_isMobile || !("IntersectionObserver" in window)) return;
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -99,10 +105,14 @@ function initReveal() {
     { threshold: 0.15 }
   );
 
-  els.forEach((el) => {
-    el.classList.add("reveal-armed");
-    void el.offsetHeight;
-    observer.observe(el);
+  // Batch the "armed" class + forced reflow into a single frame
+  // instead of one reflow per element (layout thrashing) - this was
+  // the more expensive part on longer lists, even before the mobile
+  // skip above.
+  els.forEach((el) => el.classList.add("reveal-armed"));
+  requestAnimationFrame(() => {
+    void document.body.offsetHeight; // single shared reflow
+    els.forEach((el) => observer.observe(el));
   });
 }
 
@@ -640,4 +650,3 @@ document.addEventListener("DOMContentLoaded", () => {
   loadVariables();
   initTicketBuilder();
 });
-
