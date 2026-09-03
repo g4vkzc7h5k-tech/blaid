@@ -4,13 +4,13 @@ endpoint every interval, so /api/status can report real numbers
 instead of fake ones.
 
 The bot and the website backend are separate processes on separate
-hosts (bot on PebbleHost, backend on Render) - a local file cannot
-bridge them, since neither host can see the other's filesystem. An
-HTTP POST, authenticated with a shared secret, is the only honest way
-to connect two genuinely separate machines.
+hosts (bot on PebbleHost, backend on its own VPS) - a local file
+cannot bridge them, since neither host can see the other's
+filesystem. An HTTP POST, authenticated with a shared secret, is the
+only honest way to connect two genuinely separate machines.
 
 Needs two settings (see config.py / your .env):
-  WEBSITE_API_URL      e.g. https://blaid.onrender.com
+  WEBSITE_API_URL      e.g. https://api.blaid.best
   STATUS_REPORT_TOKEN  any secret string, must match the SAME
                        environment variable set on the backend's host
 """
@@ -43,6 +43,7 @@ async def write_status(bot) -> None:
         "user_count": user_count,
         "latency_ms": latency_ms,
         "started_at": bot.started_at.timestamp(),
+        "guild_ids": [g.id for g in bot.guilds],
     }
 
     url = f"{config.website_api_url.rstrip('/')}/api/status/report"
