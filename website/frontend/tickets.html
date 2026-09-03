@@ -44,6 +44,17 @@
 
       <!-- Logged-in state -->
       <div id="tickets-app" style="display:none;">
+        <div class="user-chip-wrap">
+          <button class="user-chip" id="user-chip">
+            <img id="user-chip-avatar" class="user-chip-avatar" alt="">
+            <span id="user-chip-name"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="user-chip-caret"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="user-chip-menu" id="user-chip-menu">
+            <button id="logout-btn">Log out</button>
+          </div>
+        </div>
+
         <div class="field-group" style="max-width: 360px; margin-bottom: 28px;">
           <label>Server</label>
           <select id="guild-select"></select>
