@@ -509,6 +509,29 @@ function initTicketBuilder() {
     }
   });
 
+  const userChip = document.querySelector("#user-chip");
+  const userChipMenu = document.querySelector("#user-chip-menu");
+  const logoutBtn = document.querySelector("#logout-btn");
+
+  if (userChip) {
+    userChip.addEventListener("click", (e) => {
+      e.stopPropagation();
+      userChipMenu.classList.toggle("open");
+    });
+    document.addEventListener("click", () => userChipMenu.classList.remove("open"));
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await fetch(`${API_BASE}/api/auth/logout`, { method: "POST", credentials: "include" });
+      } catch (err) {
+        // ignore - reload happens regardless below
+      }
+      window.location.reload();
+    });
+  }
+
   fetch(`${API_BASE}/api/auth/me`, { credentials: "include" })
     .then((res) => res.json())
     .then((data) => {
@@ -517,6 +540,13 @@ function initTicketBuilder() {
         return;
       }
       app.style.display = "block";
+
+      const avatarUrl = data.user.avatar
+        ? `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png`
+        : "https://cdn.discordapp.com/embed/avatars/0.png";
+      document.querySelector("#user-chip-avatar").src = avatarUrl;
+      document.querySelector("#user-chip-name").textContent = data.user.username;
+
       guildSelect.innerHTML = (data.guilds || []).map((g) => `<option value="${g.id}">${g.name}</option>`).join("");
       if (data.guilds && data.guilds.length) loadGuildData(data.guilds[0].id);
     })
