@@ -62,7 +62,8 @@ app = FastAPI(title="Blaid API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten to your actual frontend origin in production
+    allow_origins=["https://blaid.best", "https://www.blaid.best"],
+    allow_credentials=True,  # required for the login cookie to work cross-subdomain (blaid.best <-> api.blaid.best)
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
