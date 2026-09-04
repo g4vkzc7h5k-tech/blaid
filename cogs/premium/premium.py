@@ -29,7 +29,7 @@ class Premium(commands.Cog):
 
     @command_meta(
         category="General",
-        description="Want more free slots and premium-only features? Buy Blaid Premium.",
+        description="Want more free slots and premium-only features? Buy Blade Premium.",
         syntax=",premium",
         examples=[],
         require_args=False,
@@ -44,7 +44,7 @@ class Premium(commands.Cog):
 
     @command_meta(
         category="General",
-        description="Shows what each Blaid Premium plan includes.",
+        description="Shows what each Blade Premium plan includes.",
         syntax=",plans",
         examples=[],
         require_args=False,
@@ -53,16 +53,16 @@ class Premium(commands.Cog):
     async def plans(self, ctx: commands.Context):
         description = (
             "**Server Premium**\n"
-            "> Autoresponders: `10` â `200`\n"
-            "> Reaction Roles: `15` â `250`\n"
-            "> Autoroles: `2` â `50`\n"
-            "> Log Channels: `4` â `15`\n"
-            "> Ticket Panels: `3` â `10`\n"
-            "> Level Role Rewards: `50` â `200`\n"
-            "> Button Roles: `50` â `150`\n"
-            "> Join to Create Hubs: `1` â `3`\n"
-            "> AI Questions/day: `10` â `200`\n"
-            "> Backups (,backup)\n"
+            "> Autoresponders: `10` → `200`\n"
+            "> Reaction Roles: `15` → `250`\n"
+            "> Autoroles: `2` → `50`\n"
+            "> Log Channels: `4` → `15`\n"
+            "> Ticket Panels: `3` → `10`\n"
+            "> Level Role Rewards: `50` → `200`\n"
+            "> Button Roles: `50` → `150`\n"
+            "> Join to Create Hubs: `1` → `3`\n"
+            "> AI Questions/day: `10` → `200`\n"
+            "> Backups *(coming soon)*\n"
             "> Unlocks `,funnel`, `,verification`, `,selfpurge`, `,twitch`, `,antinuke soundboard`, "
             "`,antinuke vanity`, `,antiraid avatar`, `,antiraid username`, `,firstmessage`\n"
             "> Customizable level-up stat cards\n\n"
@@ -74,7 +74,7 @@ class Premium(commands.Cog):
         await ctx.send(embed=embed)
 
     # ---------------------------------------------------------- owner-only subcommands, deliberately no
-    # @command_meta on either - keeps them out of ,help entirely, per "der ist nur fÃ¼r mich"
+    # @command_meta on either - keeps them out of ,help entirely, per "der ist nur für mich"
 
     @premium.command(name="approve")
     @commands.is_owner()
