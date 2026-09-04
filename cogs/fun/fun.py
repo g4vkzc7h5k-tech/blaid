@@ -21,6 +21,131 @@ from repositories import fun_repository
 from services import fun_service
 
 
+# ---------------------------------------------------------- tic-tac-toe
+
+# channel_id -> game state - only one game per channel at a time
+_ttt_active_games: dict[int, "TicTacToeGame"] = {}
+
+_TTT_LINES = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6))
+
+
+class TicTacToeGame:
+    def __init__(self, challenger: discord.Member, opponent: discord.Member):
+        self.challenger = challenger  # X
+        self.opponent = opponent  # O
+        self.board: list[str | None] = [None] * 9
+        self.current = challenger
+
+    @property
+    def other(self) -> discord.Member:
+        return self.opponent if self.current.id == self.challenger.id else self.challenger
+
+    def symbol_for(self, player: discord.Member) -> str:
+        return "X" if player.id == self.challenger.id else "O"
+
+    def mark(self, index: int) -> None:
+        self.board[index] = self.symbol_for(self.current)
+
+    def check_result(self) -> str | None:
+        """Returns 'X', 'O', 'draw', or None (still going)."""
+        for a, b, c in _TTT_LINES:
+            if self.board[a] is not None and self.board[a] == self.board[b] == self.board[c]:
+                return self.board[a]
+        if all(cell is not None for cell in self.board):
+            return "draw"
+        return None
+
+
+class TicTacToeView(discord.ui.View):
+    def __init__(self, game: TicTacToeGame, channel_id: int):
+        super().__init__(timeout=300)
+        self.game = game
+        self.channel_id = channel_id
+
+        for index in range(9):
+            button = discord.ui.Button(label="\u200b", style=discord.ButtonStyle.secondary, row=index // 3)
+            button.callback = self._make_callback(index)
+            self.add_item(button)
+
+    def _make_callback(self, index: int):
+        async def callback(interaction: discord.Interaction) -> None:
+            game = self.game
+
+            if interaction.user.id not in (game.challenger.id, game.opponent.id):
+                await interaction.response.send_message("This isn't your game.", ephemeral=True)
+                return
+            if interaction.user.id != game.current.id:
+                await interaction.response.send_message("It's not your turn.", ephemeral=True)
+                return
+            if game.board[index] is not None:
+                await interaction.response.send_message("That spot's already taken.", ephemeral=True)
+                return
+
+            game.mark(index)
+            button = self.children[index]
+            symbol = game.board[index]
+            button.label = symbol
+            button.style = discord.ButtonStyle.danger if symbol == "X" else discord.ButtonStyle.primary
+            button.disabled = True
+
+            result = game.check_result()
+            if result is not None:
+                for child in self.children:
+                    child.disabled = True
+                _ttt_active_games.pop(self.channel_id, None)
+
+                if result == "draw":
+                    description = "It's a draw!"
+                else:
+                    winner = game.challenger if result == "X" else game.opponent
+                    description = f"{winner.mention} wins!"
+
+                embed = discord.Embed(title="Tic-Tac-Toe", description=description)
+                await interaction.response.edit_message(embed=embed, view=self)
+                return
+
+            game.current = game.other
+            embed = discord.Embed(
+                title="Tic-Tac-Toe",
+                description=f"{game.challenger.mention} (X) vs {game.opponent.mention} (O)\n\n"
+                            f"{game.current.mention}'s turn ({game.symbol_for(game.current)})",
+            )
+            await interaction.response.edit_message(embed=embed, view=self)
+
+        return callback
+
+    async def on_timeout(self) -> None:
+        _ttt_active_games.pop(self.channel_id, None)
+        for child in self.children:
+            child.disabled = True
+
+
+# ---------------------------------------------------------- blacktea
+
+import asyncio
+import random
+
+_blacktea_active_games: dict[int, "BlackTeaGame"] = {}
+
+_BLACKTEA_TRIGRAMS = [
+    "ing", "the", "and", "ion", "tio", "ent", "for", "ter", "est", "ers",
+    "ati", "hat", "ate", "all", "eth", "ver", "his", "ith", "res", "ear",
+    "sto", "ans", "hin", "her", "ere", "ric", "con", "tra", "ade", "man",
+    "car", "sta", "gra", "und", "ous", "ive", "ome", "one", "art", "ort",
+]
+
+
+class BlackTeaGame:
+    def __init__(self, host: discord.Member, channel: discord.TextChannel):
+        self.host = host
+        self.channel = channel
+        self.lives: dict[int, int] = {}
+        self.members: dict[int, discord.Member] = {}
+        self.used_words: set[str] = set()
+        self.turn_order: list[int] = []
+        self.ended = False
+
+
 class Fun(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -62,7 +187,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Kisses a member with a random anime gif, or just posts a kiss gif if no one is given.",
+        description="Kiss someone.",
         syntax=",kiss [member]",
         examples=[",kiss @User", ",kiss"],
         require_args=False,
@@ -74,7 +199,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random hug anime gif, optionally at a member.",
+        description="Hug someone.",
         syntax=",hug [member]",
         examples=[",hug @User", ",hug"],
         require_args=False,
@@ -86,7 +211,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random bite anime gif, optionally at a member.",
+        description="Bite someone.",
         syntax=",bite [member]",
         examples=[",bite @User", ",bite"],
         require_args=False,
@@ -98,7 +223,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random cuddle anime gif, optionally at a member.",
+        description="Cuddle someone.",
         syntax=",cuddle [member]",
         examples=[",cuddle @User", ",cuddle"],
         require_args=False,
@@ -110,7 +235,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random feed anime gif, optionally at a member.",
+        description="Feed someone.",
         syntax=",feed [member]",
         examples=[",feed @User", ",feed"],
         require_args=False,
@@ -122,7 +247,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random handhold anime gif, optionally at a member.",
+        description="Handhold someone.",
         syntax=",handhold [member]",
         examples=[",handhold @User", ",handhold"],
         require_args=False,
@@ -134,7 +259,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random handshake anime gif, optionally at a member.",
+        description="Handshake someone.",
         syntax=",handshake [member]",
         examples=[",handshake @User", ",handshake"],
         require_args=False,
@@ -146,7 +271,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random highfive anime gif, optionally at a member.",
+        description="Highfive someone.",
         syntax=",highfive [member]",
         examples=[",highfive @User", ",highfive"],
         require_args=False,
@@ -158,7 +283,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random laugh anime gif, optionally at a member.",
+        description="Laugh someone.",
         syntax=",laugh [member]",
         examples=[",laugh @User", ",laugh"],
         require_args=False,
@@ -170,7 +295,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random nod anime gif, optionally at a member.",
+        description="Nod someone.",
         syntax=",nod [member]",
         examples=[",nod @User", ",nod"],
         require_args=False,
@@ -182,7 +307,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random nom anime gif, optionally at a member.",
+        description="Nom someone.",
         syntax=",nom [member]",
         examples=[",nom @User", ",nom"],
         require_args=False,
@@ -194,7 +319,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random nope anime gif, optionally at a member.",
+        description="Nope someone.",
         syntax=",nope [member]",
         examples=[",nope @User", ",nope"],
         require_args=False,
@@ -206,7 +331,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random pat anime gif, optionally at a member.",
+        description="Pat someone.",
         syntax=",pat [member]",
         examples=[",pat @User", ",pat"],
         require_args=False,
@@ -218,7 +343,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random peck anime gif, optionally at a member.",
+        description="Peck someone.",
         syntax=",peck [member]",
         examples=[",peck @User", ",peck"],
         require_args=False,
@@ -230,7 +355,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random poke anime gif, optionally at a member.",
+        description="Poke someone.",
         syntax=",poke [member]",
         examples=[",poke @User", ",poke"],
         require_args=False,
@@ -242,7 +367,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random punch anime gif, optionally at a member.",
+        description="Punch someone.",
         syntax=",punch [member]",
         examples=[",punch @User", ",punch"],
         require_args=False,
@@ -254,7 +379,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random run anime gif, optionally at a member.",
+        description="Run someone.",
         syntax=",run [member]",
         examples=[",run @User", ",run"],
         require_args=False,
@@ -266,7 +391,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random shoot anime gif, optionally at a member.",
+        description="Shoot someone.",
         syntax=",shoot [member]",
         examples=[",shoot @User", ",shoot"],
         require_args=False,
@@ -278,7 +403,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random slap anime gif, optionally at a member.",
+        description="Slap someone.",
         syntax=",slap [member]",
         examples=[",slap @User", ",slap"],
         require_args=False,
@@ -290,7 +415,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random stare anime gif, optionally at a member.",
+        description="Stare someone.",
         syntax=",stare [member]",
         examples=[",stare @User", ",stare"],
         require_args=False,
@@ -302,7 +427,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random think anime gif, optionally at a member.",
+        description="Think someone.",
         syntax=",think [member]",
         examples=[",think @User", ",think"],
         require_args=False,
@@ -314,7 +439,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random thumbsup anime gif, optionally at a member.",
+        description="Thumbsup someone.",
         syntax=",thumbsup [member]",
         examples=[",thumbsup @User", ",thumbsup"],
         require_args=False,
@@ -326,7 +451,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random tickle anime gif, optionally at a member.",
+        description="Tickle someone.",
         syntax=",tickle [member]",
         examples=[",tickle @User", ",tickle"],
         require_args=False,
@@ -338,7 +463,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random wave anime gif, optionally at a member.",
+        description="Wave someone.",
         syntax=",wave [member]",
         examples=[",wave @User", ",wave"],
         require_args=False,
@@ -350,7 +475,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random wink anime gif, optionally at a member.",
+        description="Wink someone.",
         syntax=",wink [member]",
         examples=[",wink @User", ",wink"],
         require_args=False,
@@ -362,7 +487,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random yeet anime gif, optionally at a member.",
+        description="Yeet someone.",
         syntax=",yeet [member]",
         examples=[",yeet @User", ",yeet"],
         require_args=False,
@@ -374,7 +499,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random blush anime gif.",
+        description="Blush someone.",
         syntax=",blush",
         examples=[",blush"],
         require_args=False,
@@ -386,7 +511,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random bored anime gif.",
+        description="Bore someone.",
         syntax=",bored",
         examples=[",bored"],
         require_args=False,
@@ -398,7 +523,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random cry anime gif.",
+        description="Cry someone.",
         syntax=",cry",
         examples=[",cry"],
         require_args=False,
@@ -410,7 +535,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random facepalm anime gif.",
+        description="Facepalm someone.",
         syntax=",facepalm",
         examples=[",facepalm"],
         require_args=False,
@@ -422,7 +547,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random happy anime gif.",
+        description="Happy someone.",
         syntax=",happy",
         examples=[",happy"],
         require_args=False,
@@ -434,7 +559,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random lurk anime gif.",
+        description="Lurk someone.",
         syntax=",lurk",
         examples=[",lurk"],
         require_args=False,
@@ -446,7 +571,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random pout anime gif.",
+        description="Pout someone.",
         syntax=",pout",
         examples=[",pout"],
         require_args=False,
@@ -458,7 +583,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random shrug anime gif.",
+        description="Shrug someone.",
         syntax=",shrug",
         examples=[",shrug"],
         require_args=False,
@@ -470,7 +595,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random sleep anime gif.",
+        description="Sleep someone.",
         syntax=",sleep",
         examples=[",sleep"],
         require_args=False,
@@ -482,7 +607,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random smile anime gif.",
+        description="Smile someone.",
         syntax=",smile",
         examples=[",smile"],
         require_args=False,
@@ -494,7 +619,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random smug anime gif.",
+        description="Smug someone.",
         syntax=",smug",
         examples=[",smug"],
         require_args=False,
@@ -506,7 +631,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random yawn anime gif.",
+        description="Yawn someone.",
         syntax=",yawn",
         examples=[",yawn"],
         require_args=False,
@@ -518,7 +643,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random fuck gif (NSFW) - only usable in an NSFW channel, optionally at a member.",
+        description="Fuck someone. (NSFW)",
         syntax=",fuck [member]",
         examples=[",fuck @User", ",fuck"],
         require_args=False,
@@ -532,7 +657,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random nutkick gif (NSFW) - only usable in an NSFW channel, optionally at a member.",
+        description="Nutkick someone. (NSFW)",
         syntax=",nutkick [member]",
         examples=[",nutkick @User", ",nutkick"],
         require_args=False,
@@ -546,7 +671,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Sends a random spank gif (NSFW) - only usable in an NSFW channel, optionally at a member.",
+        description="Spank someone. (NSFW)",
         syntax=",spank [member]",
         examples=[",spank @User", ",spank"],
         require_args=False,
@@ -561,7 +686,7 @@ class Fun(commands.Cog):
 
     @command_meta(
         category="Fun",
-        description="Ships two members and shows a compatibility percentage - or you and one member if only one is given.",
+        description="Check two people´s compatibility.",
         syntax=",ship <member> [member2]",
         examples=[",ship @User", ",ship @User1 @User2"],
     )
@@ -575,6 +700,8 @@ class Fun(commands.Cog):
         bar = fun_service.ship_bar(percentage)
         comment = fun_service.ship_comment(percentage)
 
+        gif_url = await fun_service.fetch_reaction_gif("kiss")
+
         embed = discord.Embed(
             title=f"{user1.display_name} 💞 {user2.display_name}",
             description=(
@@ -583,6 +710,8 @@ class Fun(commands.Cog):
                 f"{comment}"
             ),
         )
+        if gif_url:
+            embed.set_image(url=gif_url)
         await ctx.send(embed=embed)
 
     # ---------------------------------------------------------- smoke / spark (self-only)
@@ -641,6 +770,325 @@ class Fun(commands.Cog):
         async with get_session() as session:
             await fun_repository.set_vape_flavor(session, ctx.guild.id, ctx.author.id, flavor)
         await ctx.success(f"Your vape flavor is now set to **{flavor}**.")
+
+
+    # ---------------------------------------------------------- tic-tac-toe
+
+    @command_meta(
+        category="Fun",
+        description="Play tic-tac-toe against another member.",
+        syntax=",tictactoe <opponent>",
+        examples=[",tictactoe @User"],
+        aliases=["ttt"],
+    )
+    @commands.hybrid_group(name="tictactoe", aliases=["ttt"], invoke_without_command=True)
+    @commands.guild_only()
+    async def tictactoe(self, ctx: commands.Context, opponent: discord.Member = None):
+        if opponent is None:
+            embed = discord.Embed(
+                description=f"⚠️ {ctx.author.mention}: You need to provide `opponent`.",
+                color=discord.Color.orange(),
+            )
+            await ctx.send(embed=embed)
+            return
+
+        if opponent.id == ctx.author.id:
+            await ctx.error("You can't play against yourself.")
+            return
+        if opponent.bot:
+            await ctx.error("You can't play against a bot.")
+            return
+        if ctx.channel.id in _ttt_active_games:
+            await ctx.error("There's already a tic-tac-toe game running in this channel.")
+            return
+
+        game = TicTacToeGame(ctx.author, opponent)
+        _ttt_active_games[ctx.channel.id] = game
+        view = TicTacToeView(game, ctx.channel.id)
+
+        embed = discord.Embed(
+            title="Tic-Tac-Toe",
+            description=f"{ctx.author.mention} (X) vs {opponent.mention} (O)\n\n{ctx.author.mention}'s turn (X)",
+        )
+        await ctx.send(embed=embed, view=view)
+
+    @tictactoe.command(name="help")
+    async def tictactoe_help_cmd(self, ctx: commands.Context):
+        from core.help_formatter import send_help
+        await send_help(ctx, "tictactoe")
+
+    @command_meta(
+        category="Fun",
+        description="Cancel the running tic-tac-toe game in this channel.",
+        syntax=",ttt cancel",
+        examples=[",ttt cancel"],
+        require_args=False,
+    )
+    @tictactoe.command(name="cancel")
+    async def tictactoe_cancel(self, ctx: commands.Context):
+        game = _ttt_active_games.pop(ctx.channel.id, None)
+        if game is None:
+            await ctx.error("There's no tic-tac-toe game running in this channel.")
+            return
+        await ctx.success("Cancelled the tic-tac-toe game.")
+
+
+    # ---------------------------------------------------------- pp
+
+    @command_meta(
+        category="Fun",
+        description="Measure someone's... size.",
+        syntax=",pp [member]",
+        examples=[",pp", ",pp @User"],
+        aliases=["dih"],
+        require_args=False,
+    )
+    @commands.command(name="pp", aliases=["dih"])
+    @commands.guild_only()
+    async def pp(self, ctx: commands.Context, member: discord.Member = None):
+        import random
+
+        target = member or ctx.author
+        size = random.Random(target.id).randint(0, 12)
+
+        if target.id == ctx.author.id:
+            text = f"{ctx.author.mention} Your dih is `{size} inches`"
+        else:
+            text = f"{ctx.author.mention} {target.mention}'s dih is `{size} inches`"
+
+        embed = discord.Embed(description=text)
+        await ctx.send(embed=embed)
+
+    # ---------------------------------------------------------- iq / how-x stat commands
+
+    @command_meta(
+        category="Fun",
+        description="Measure someone's IQ.",
+        syntax=",iq [member]",
+        examples=[",iq", ",iq @User"],
+        require_args=False,
+    )
+    @commands.command(name="iq")
+    @commands.guild_only()
+    async def iq(self, ctx: commands.Context, member: discord.Member = None):
+        import random
+
+        target = member or ctx.author
+        score = random.Random(target.id).randint(50, 160)
+
+        if target.id == ctx.author.id:
+            text = f"{ctx.author.mention} Your IQ is `{score}`"
+        else:
+            text = f"{ctx.author.mention} {target.mention}'s IQ is `{score}`"
+
+        await ctx.send(embed=discord.Embed(description=text))
+
+    async def _how_stat(self, ctx: commands.Context, member: discord.Member | None, label: str, seed_salt: str) -> None:
+        import random
+
+        target = member or ctx.author
+        percent = random.Random(f"{target.id}{seed_salt}").randint(0, 100)
+
+        if target.id == ctx.author.id:
+            text = f"{ctx.author.mention} You are `{percent}%` {label}"
+        else:
+            text = f"{ctx.author.mention} {target.mention} is `{percent}%` {label}"
+
+        await ctx.send(embed=discord.Embed(description=text))
+
+    @command_meta(
+        category="Fun",
+        description="Measure how gay someone is.",
+        syntax=",howgay [member]",
+        examples=[",howgay", ",howgay @User"],
+        require_args=False,
+    )
+    @commands.command(name="howgay")
+    @commands.guild_only()
+    async def howgay(self, ctx: commands.Context, member: discord.Member = None):
+        await self._how_stat(ctx, member, "gay", "gay")
+
+    @command_meta(
+        category="Fun",
+        description="Measure how lesbian someone is.",
+        syntax=",howlesbian [member]",
+        examples=[",howlesbian", ",howlesbian @User"],
+        require_args=False,
+    )
+    @commands.command(name="howlesbian")
+    @commands.guild_only()
+    async def howlesbian(self, ctx: commands.Context, member: discord.Member = None):
+        await self._how_stat(ctx, member, "lesbian", "lesbian")
+
+    @command_meta(
+        category="Fun",
+        description="Measure how autistic someone is.",
+        syntax=",howautism [member]",
+        examples=[",howautism", ",howautism @User"],
+        require_args=False,
+    )
+    @commands.command(name="howautism")
+    @commands.guild_only()
+    async def howautism(self, ctx: commands.Context, member: discord.Member = None):
+        await self._how_stat(ctx, member, "autistic", "autism")
+
+    @command_meta(
+        category="Fun",
+        description="Measure how much of a simp someone is.",
+        syntax=",howsimp [member]",
+        examples=[",howsimp", ",howsimp @User"],
+        require_args=False,
+    )
+    @commands.command(name="howsimp")
+    @commands.guild_only()
+    async def howsimp(self, ctx: commands.Context, member: discord.Member = None):
+        await self._how_stat(ctx, member, "a simp", "simp")
+
+
+    # ---------------------------------------------------------- blacktea
+
+    @command_meta(
+        category="Fun",
+        description="Play a game of BlackTea - say a word containing the given letters.",
+        syntax=",blacktea",
+        examples=[",blacktea"],
+        require_args=False,
+    )
+    @commands.group(name="blacktea", invoke_without_command=True)
+    @commands.guild_only()
+    async def blacktea(self, ctx: commands.Context):
+        if ctx.channel.id in _blacktea_active_games:
+            await ctx.error("There's already a BlackTea game running in this channel.")
+            return
+
+        game = BlackTeaGame(ctx.author, ctx.channel)
+        _blacktea_active_games[ctx.channel.id] = game
+
+        embed = discord.Embed(
+            description=(
+                "Waiting for players, react with `✅` to join. The game will begin in 30 seconds.\n\n"
+                "`GOAL:` You have 10 seconds to say a word containing the given group of 3 letters. "
+                "Failure to do so within the 10 seconds will lose a life. Each player has 2 lives to begin with.\n\n"
+                "`NOTES:` A word can only be used once through the course of the game."
+            )
+        )
+        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
+        join_message = await ctx.send(embed=embed)
+        await join_message.add_reaction("✅")
+
+        await asyncio.sleep(30)
+
+        join_message = await ctx.channel.fetch_message(join_message.id)
+        reaction = discord.utils.get(join_message.reactions, emoji="✅")
+        players = []
+        if reaction is not None:
+            async for user in reaction.users():
+                if not user.bot:
+                    players.append(user)
+
+        if len(players) < 2:
+            _blacktea_active_games.pop(ctx.channel.id, None)
+            embed = discord.Embed(
+                description=f"⚠️ {ctx.author.mention}: Not enough players to start!",
+                color=discord.Color.orange(),
+            )
+            await ctx.send(embed=embed)
+            return
+
+        for player in players:
+            game.lives[player.id] = 2
+            game.members[player.id] = player
+        game.turn_order = [p.id for p in players]
+        random.shuffle(game.turn_order)
+
+        await self._run_blacktea_game(ctx, game)
+
+    async def _run_blacktea_game(self, ctx: commands.Context, game: "BlackTeaGame") -> None:
+        turn_index = 0
+
+        while sum(1 for pid in game.turn_order if game.lives.get(pid, 0) > 0) > 1:
+            if game.ended:
+                break
+
+            current_id = game.turn_order[turn_index % len(game.turn_order)]
+            turn_index += 1
+            if game.lives.get(current_id, 0) <= 0:
+                continue
+
+            current_member = game.members[current_id]
+            letters = random.choice(_BLACKTEA_TRIGRAMS)
+
+            embed = discord.Embed(
+                description=(
+                    f"Say a word containing: `{letters.upper()}`\n\n"
+                    f"You have **10 seconds**. Each player has **2 lives**."
+                )
+            )
+            embed.set_footer(text=f"Lives remaining: {game.lives[current_id]}")
+            await ctx.send(content=current_member.mention, embed=embed)
+
+            def check(message: discord.Message) -> bool:
+                if message.channel.id != ctx.channel.id or message.author.id != current_id:
+                    return False
+                word = message.content.strip().lower()
+                if not word.isalpha():
+                    return False
+                if letters not in word:
+                    return False
+                if word in game.used_words:
+                    return False
+                return True
+
+            try:
+                message = await self.bot.wait_for("message", check=check, timeout=10)
+            except asyncio.TimeoutError:
+                if game.ended:
+                    break
+                game.lives[current_id] -= 1
+                embed = discord.Embed(description=f"⏱️ {current_member.mention} ran out of time and lost a life!")
+                if game.lives[current_id] <= 0:
+                    embed.description += f"\n{current_member.mention} is **eliminated**."
+                await ctx.send(embed=embed)
+                continue
+
+            game.used_words.add(message.content.strip().lower())
+            try:
+                await message.add_reaction("✅")
+            except discord.HTTPException:
+                pass
+
+        _blacktea_active_games.pop(ctx.channel.id, None)
+        if game.ended:
+            return
+
+        remaining = [pid for pid in game.turn_order if game.lives.get(pid, 0) > 0]
+        if remaining:
+            winner = game.members[remaining[0]]
+            await ctx.send(embed=discord.Embed(description=f"🏆 {winner.mention} wins the game!"))
+        else:
+            await ctx.send(embed=discord.Embed(description="The game ended with no winner."))
+
+    @blacktea.command(name="help")
+    async def blacktea_help_cmd(self, ctx: commands.Context):
+        from core.help_formatter import send_help
+        await send_help(ctx, "blacktea")
+
+    @command_meta(
+        category="Fun",
+        description="End the current BlackTea game.",
+        syntax=",blacktea end",
+        examples=[",blacktea end"],
+        require_args=False,
+    )
+    @blacktea.command(name="end")
+    async def blacktea_end(self, ctx: commands.Context):
+        game = _blacktea_active_games.get(ctx.channel.id)
+        if game is None:
+            await ctx.error("There's no BlackTea game running in this channel.")
+            return
+        game.ended = True
+        _blacktea_active_games.pop(ctx.channel.id, None)
+        await ctx.success("Ended the BlackTea game.")
 
 
 async def setup(bot: commands.Bot):
