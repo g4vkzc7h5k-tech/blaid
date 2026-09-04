@@ -1,7 +1,15 @@
 """
-,premium and ,plans - category "General". ,premium approve/remove are
-owner-only and deliberately excluded from command_meta (no @command_meta
-decorator) so they never show up in ,help.
+,premium - category "General". Buying now goes through Discord's own
+App Monetization (real purchase buttons, native checkout) instead of
+the old manual billing-channel flow - see services/premium_service.py
+for the entitlement-handling side of this.
+
+,plans is gone - the plan details now live on the premium buttons/
+website instead of a separate command.
+
+,premium approve/remove are owner-only manual overrides (e.g. gifting
+premium, or fixing a sync issue) and deliberately excluded from
+command_meta so they never show up in ,help.
 """
 
 from __future__ import annotations
@@ -9,7 +17,7 @@ from __future__ import annotations
 import datetime
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 from core.command_meta import command_meta
 from database.database import get_session
@@ -20,16 +28,32 @@ from services import premium_service
 class Premium(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        premium_service.check_renewals.start(bot)
 
-    def cog_unload(self) -> None:
-        premium_service.check_renewals.cancel()
+    async def cog_load(self) -> None:
+        synced = await premium_service.sync_entitlements(self.bot)
+        if synced:
+            import logging
+            logging.getLogger("blade.premium").info("Synced %d active entitlement(s) on startup.", synced)
+
+    # ---------------------------------------------------------- entitlement events
+
+    @commands.Cog.listener()
+    async def on_entitlement_create(self, entitlement: discord.Entitlement):
+        await premium_service.apply_entitlement(self.bot, entitlement, active=True)
+
+    @commands.Cog.listener()
+    async def on_entitlement_update(self, entitlement: discord.Entitlement):
+        await premium_service.apply_entitlement(self.bot, entitlement, active=not entitlement.deleted)
+
+    @commands.Cog.listener()
+    async def on_entitlement_delete(self, entitlement: discord.Entitlement):
+        await premium_service.apply_entitlement(self.bot, entitlement, active=False)
 
     # ---------------------------------------------------------- ,premium
 
     @command_meta(
         category="General",
-        description="Want more free slots and premium-only features? Buy Blade Premium.",
+        description="Want more free slots and premium-only features? Buy Blaid Premium.",
         syntax=",premium",
         examples=[],
         require_args=False,
@@ -37,48 +61,15 @@ class Premium(commands.Cog):
     @commands.group(name="premium", with_app_command=False, invoke_without_command=True)
     @commands.guild_only()
     async def premium(self, ctx: commands.Context):
-        view = premium_service.GetPremiumView()
+        view = premium_service.ChoosePlanView()
         await ctx.send(view=view)
 
-    # ---------------------------------------------------------- ,plans
-
-    @command_meta(
-        category="General",
-        description="Shows what each Blade Premium plan includes.",
-        syntax=",plans",
-        examples=[],
-        require_args=False,
-    )
-    @commands.command(name="plans", with_app_command=False)
-    async def plans(self, ctx: commands.Context):
-        description = (
-            "**Server Premium**\n"
-            "> Autoresponders: `10` → `200`\n"
-            "> Reaction Roles: `15` → `250`\n"
-            "> Autoroles: `2` → `50`\n"
-            "> Log Channels: `4` → `15`\n"
-            "> Ticket Panels: `3` → `10`\n"
-            "> Level Role Rewards: `50` → `200`\n"
-            "> Button Roles: `50` → `150`\n"
-            "> Join to Create Hubs: `1` → `3`\n"
-            "> AI Questions/day: `10` → `200`\n"
-            "> Backups *(coming soon)*\n"
-            "> Unlocks `,funnel`, `,verification`, `,selfpurge`, `,twitch`, `,antinuke soundboard`, "
-            "`,antinuke vanity`, `,antiraid avatar`, `,antiraid username`, `,firstmessage`\n"
-            "> Customizable level-up stat cards\n\n"
-            "**Customize**\n"
-            "> Unlocks the entire `,customize` command family - a server-specific bot name, avatar, banner, and bio\n\n"
-            "Run `,premium` to buy."
-        )
-        embed = discord.Embed(title="Premium Plans", description=description)
-        await ctx.send(embed=embed)
-
-    # ---------------------------------------------------------- owner-only subcommands, deliberately no
-    # @command_meta on either - keeps them out of ,help entirely, per "der ist nur für mich"
+    # ---------------------------------------------------------- owner-only manual overrides, deliberately
+    # no @command_meta on either - keeps them out of ,help entirely
 
     @premium.command(name="approve")
     @commands.is_owner()
-    async def premium_approve(self, ctx: commands.Context, plan: str, guild_id: int):
+    async def premium_approve(self, ctx: commands.Context, plan: str, guild_id: int, period: str = "lifetime"):
         plan = plan.lower()
         if plan in ("serverpremium", "server"):
             plan = "server"
@@ -88,15 +79,9 @@ class Premium(commands.Cog):
             await ctx.send("Plan must be `customize` or `serverpremium`.")
             return
 
-        async with get_session() as session:
-            purchase = await premium_repository.get_latest_pending_purchase(session, guild_id, plan)
-
-        period = purchase.billing_period if purchase else "lifetime"
         expires_at = None
         if period == "monthly":
             expires_at = discord.utils.utcnow() + datetime.timedelta(days=30)
-        elif period == "yearly":
-            expires_at = discord.utils.utcnow() + datetime.timedelta(days=365)
 
         async with get_session() as session:
             cfg = await premium_repository.get_or_create_config(session, guild_id)
@@ -109,12 +94,7 @@ class Premium(commands.Cog):
                     session, cfg, customize_premium=True, customize_premium_expires_at=expires_at
                 )
 
-        sent_to_channel = await premium_service.send_approval_confirmation(self.bot, guild_id, plan)
-
-        confirmation = f"Approved **{plan}** premium for guild `{guild_id}`."
-        if not sent_to_channel:
-            confirmation += " (No pending billing channel found to notify - message the buyer directly.)"
-        await ctx.send(confirmation)
+        await ctx.send(f"Manually granted **{plan}** premium ({period}) for guild `{guild_id}`.")
 
     @premium.command(name="remove")
     @commands.is_owner()
