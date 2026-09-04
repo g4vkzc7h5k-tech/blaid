@@ -40,7 +40,7 @@ INITIAL_COGS = [
     "cogs.twitch.twitch",
     "cogs.youtube.youtube",
     "cogs.pingonjoin.pingonjoin",
-    "cogs.premium.premium",
+    # "cogs.premium.premium",  # temporarily disabled - premium purchasing isn't ready yet, see premium_service.py
     "cogs.schedule.schedule",
     "cogs.lastfm.lastfm",
     "cogs.autopfp.autopfp",
@@ -51,8 +51,6 @@ INITIAL_COGS = [
     "cogs.badge.badge",
     "cogs.commandtoggle.commandtoggle",
     "cogs.avatarfx.avatarfx",
-    "cogs.invoke.invoke",
-    "cogs.bumpreminder.bumpreminder",
 ]
 
 
@@ -112,7 +110,6 @@ class Blade(commands.Bot):
 
     async def on_ready(self) -> None:
         log.info("Blade is online as %s (%s)", self.user, self.user.id if self.user else "?")
-        await self.change_presence(activity=discord.Game(name=f"{config.default_prefix}help"))
 
         await self._load_guild_prefixes()
         await self._load_user_prefixes()
@@ -133,6 +130,9 @@ class Blade(commands.Bot):
         if not self._website_ticket_sync.is_running():
             self._website_ticket_sync.start()
 
+        if not self._rotate_status.is_running():
+            self._rotate_status.start()
+
     @tasks.loop(seconds=60)
     async def _status_writer(self) -> None:
         from services.status_service import write_status
@@ -142,6 +142,22 @@ class Blade(commands.Bot):
     async def _website_ticket_sync(self) -> None:
         from services.website_ticket_sync_service import poll_and_build
         await poll_and_build(self)
+
+    _STATUS_TEXTS = ["🔗 blaid.best", "🔗 discord.gg/blaid"]
+    _status_index = 0
+
+    @tasks.loop(seconds=5)
+    async def _rotate_status(self) -> None:
+        text = self._STATUS_TEXTS[self._status_index % len(self._STATUS_TEXTS)]
+        self._status_index += 1
+        try:
+            await self.change_presence(activity=discord.CustomActivity(name=text))
+        except discord.HTTPException:
+            pass
+
+    @_rotate_status.before_loop
+    async def _before_rotate_status(self) -> None:
+        await self.wait_until_ready()
 
     async def _load_guild_prefixes(self) -> None:
         from sqlalchemy import select
@@ -200,6 +216,11 @@ class Blade(commands.Bot):
         resolved = await alias_service.resolve(message.guild.id, alias_name, remaining)
         if resolved is None:
             return None
+
+        return f"{prefix}{resolved}"
+
+    async def on_command_error(self, ctx: commands.Context, error: Exception) -> None:
+        await handle_command_error(ctx, error)
 
         return f"{prefix}{resolved}"
 
