@@ -847,6 +847,37 @@ select {
 
 select:focus { border-color: var(--red); }
 
+/* Refund policy (premium.html) */
+
+.refund-policy {
+  max-width: 760px;
+  margin: 60px auto 0;
+  padding-top: 40px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.refund-policy h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  margin: 0 0 24px;
+}
+
+.refund-section { margin-bottom: 24px; }
+
+.refund-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.refund-section p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
 /* User chip (login status, top-right of ticket builder) */
 
 .user-chip-wrap {
