@@ -68,7 +68,7 @@ class Economy(commands.Cog):
         examples=[],
         require_args=False,
     )
-    @commands.hybrid_command(name="economy")
+    @commands.command(name="economy", with_app_command=False)
     async def economy(self, ctx: commands.Context):
         await send_help(ctx, "economy")
 
@@ -81,7 +81,7 @@ class Economy(commands.Cog):
         examples=[",balance", ",balance @User"],
         require_args=False,
     )
-    @commands.hybrid_command(name="balance", aliases=["bal"])
+    @commands.command(name="balance", aliases=["bal"], with_app_command=False)
     @commands.guild_only()
     async def balance(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
@@ -160,7 +160,7 @@ class Economy(commands.Cog):
         syntax=",deposit <amount|all>",
         examples=[",deposit 500", ",deposit all"],
     )
-    @commands.hybrid_command(name="deposit")
+    @commands.command(name="deposit", with_app_command=False)
     @commands.guild_only()
     async def deposit(self, ctx: commands.Context, amount: str):
         async with get_session() as session:
@@ -186,7 +186,7 @@ class Economy(commands.Cog):
         syntax=",withdraw <amount|all>",
         examples=[",withdraw 500", ",withdraw all"],
     )
-    @commands.hybrid_command(name="withdraw")
+    @commands.command(name="withdraw", with_app_command=False)
     @commands.guild_only()
     async def withdraw(self, ctx: commands.Context, amount: str):
         async with get_session() as session:
@@ -212,7 +212,7 @@ class Economy(commands.Cog):
         syntax=",transfer <member> <amount>",
         examples=[",transfer @User 500"],
     )
-    @commands.hybrid_command(name="transfer", aliases=["pay"])
+    @commands.command(name="transfer", aliases=["pay"], with_app_command=False)
     @commands.guild_only()
     async def transfer(self, ctx: commands.Context, member: discord.Member, amount: int):
         if member.id == ctx.author.id:
@@ -241,7 +241,7 @@ class Economy(commands.Cog):
         examples=[",daily"],
         require_args=False,
     )
-    @commands.hybrid_command(name="daily")
+    @commands.command(name="daily", with_app_command=False)
     @commands.guild_only()
     async def daily(self, ctx: commands.Context):
         async with get_session() as session:
@@ -268,7 +268,7 @@ class Economy(commands.Cog):
         examples=[",work"],
         require_args=False,
     )
-    @commands.hybrid_command(name="work")
+    @commands.command(name="work", with_app_command=False)
     @commands.guild_only()
     async def work(self, ctx: commands.Context):
         async with get_session() as session:
@@ -298,7 +298,7 @@ class Economy(commands.Cog):
         examples=[",crime"],
         require_args=False,
     )
-    @commands.hybrid_command(name="crime")
+    @commands.command(name="crime", with_app_command=False)
     @commands.guild_only()
     async def crime(self, ctx: commands.Context):
         async with get_session() as session:
@@ -334,7 +334,7 @@ class Economy(commands.Cog):
         syntax=",rob <member>",
         examples=[",rob @User"],
     )
-    @commands.hybrid_command(name="rob")
+    @commands.command(name="rob", with_app_command=False)
     @commands.guild_only()
     async def rob(self, ctx: commands.Context, member: discord.Member):
         if member.id == ctx.author.id:
@@ -392,7 +392,7 @@ class Economy(commands.Cog):
         aliases=["lb"],
         require_args=False,
     )
-    @commands.hybrid_command(name="leaderboard", aliases=["lb"])
+    @commands.command(name="leaderboard", aliases=["lb"], with_app_command=False)
     @commands.guild_only()
     async def leaderboard(self, ctx: commands.Context):
         async with get_session() as session:
@@ -406,7 +406,7 @@ class Economy(commands.Cog):
         for i, row in enumerate(rows, start=1):
             member = ctx.guild.get_member(row.user_id)
             name = member.display_name if member else f"User {row.user_id}"
-            lines.append(f"`{i:02d}` **{name}** â {_money(row.wallet + row.bank)}")
+            lines.append(f"`{i:02d}` **{name}** â {_money(row.wallet + row.bank)}")
 
         embed = discord.Embed(title=f"Richest in {ctx.guild.name}", description="\n".join(lines), color=core_embeds.COLOR_INFO)
         await ctx.send(embed=embed)
@@ -420,7 +420,7 @@ class Economy(commands.Cog):
         examples=[",shop"],
         require_args=False,
     )
-    @commands.hybrid_group(name="shop", invoke_without_command=True)
+    @commands.group(name="shop", invoke_without_command=True, with_app_command=False)
     @commands.guild_only()
     async def shop(self, ctx: commands.Context):
         async with get_session() as session:
@@ -430,7 +430,7 @@ class Economy(commands.Cog):
             await ctx.info("This server's shop is empty.")
             return
 
-        lines = [f"`#{item.id}` **{item.name}** â {_money(item.price)}" for item in items]
+        lines = [f"`#{item.id}` **{item.name}** â {_money(item.price)}" for item in items]
         embed = discord.Embed(title=f"{ctx.guild.name} Shop", description="\n".join(lines), color=core_embeds.COLOR_INFO)
         embed.set_footer(text="Buy with ,shop buy <#>")
         await ctx.send(embed=embed)
@@ -625,7 +625,7 @@ class Economy(commands.Cog):
         winnings = int(amount * multiplier)
         payout = winnings - amount
         won = winnings > amount
-        desc = f"The ball landed on **x{multiplier}** â " + (
+        desc = f"The ball landed on **x{multiplier}** â " + (
             f"you won {_money(winnings)}!" if winnings > 0 else f"you lost {_money(amount)}."
         )
         await self._resolve_bet(ctx, amount, payout, desc, won)
@@ -669,11 +669,11 @@ class Economy(commands.Cog):
         if await self._place_bet(ctx, amount) is None:
             return
 
-        symbols = ["ð", "ð", "ð", "ð", "ð", "7ï¸â£"]
+        symbols = ["ð", "ð", "ð", "ð", "ð", "7ï¸â£"]
         reels = [random.choice(symbols) for _ in range(3)]
 
         if reels[0] == reels[1] == reels[2]:
-            multiplier = 10 if reels[0] == "7ï¸â£" else 5
+            multiplier = 10 if reels[0] == "7ï¸â£" else 5
         elif len(set(reels)) == 2:
             multiplier = 1.5
         else:
@@ -810,7 +810,7 @@ class Economy(commands.Cog):
 class BlackjackGame:
     """Standard blackjack rules, ace counted as 1 or 11."""
 
-    SUITS = ["â ", "â¥", "â¦", "â£"]
+    SUITS = ["â ", "â¥", "â¦", "â£"]
     RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 
     def __init__(self, bet: int):
