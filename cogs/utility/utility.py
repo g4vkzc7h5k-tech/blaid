@@ -316,7 +316,7 @@ class PermissionsView(discord.ui.LayoutView):
 
         components = [
             discord.ui.Section(
-                discord.ui.TextDisplay(f"# {member.display_name}'s permissions â {len(permission_names)}"),
+                discord.ui.TextDisplay(f"# {member.display_name}'s permissions â {len(permission_names)}"),
                 accessory=discord.ui.Thumbnail(media=member.display_avatar.url),
             ),
             discord.ui.Separator(visible=True),
@@ -445,7 +445,7 @@ class EmojisView(discord.ui.LayoutView):
         lines = [f"{emoji} {emoji.name}" for emoji in chunk] or ["No emojis found."]
 
         components = [
-            discord.ui.TextDisplay(f"# Emojis in {guild.name} â {len(emojis)}/{guild.emoji_limit}"),
+            discord.ui.TextDisplay(f"# Emojis in {guild.name} â {len(emojis)}/{guild.emoji_limit}"),
             discord.ui.Separator(visible=True),
             discord.ui.TextDisplay("\n".join(lines)),
             discord.ui.Separator(visible=True),
@@ -505,7 +505,7 @@ class Utility(commands.Cog):
 
         for item in due:
             description = item.description or "No description"
-            embed = discord.Embed(description=f"â° Reminder: {description}")
+            embed = discord.Embed(description=f"â° Reminder: {description}")
             sent = False
 
             channel = self.bot.get_channel(item.channel_id)
@@ -555,7 +555,7 @@ class Utility(commands.Cog):
                 set_at = set_at.replace(tzinfo=datetime.timezone.utc)
             seconds = int((discord.utils.utcnow() - set_at).total_seconds())
             embed = discord.Embed(
-                description=f"{message.author.mention}: ð **Welcome back,** you went away for **{format_duration(seconds)}**."
+                description=f"{message.author.mention}: ð **Welcome back,** you went away for **{format_duration(seconds)}**."
             )
             await message.channel.send(embed=embed)
 
@@ -618,7 +618,7 @@ class Utility(commands.Cog):
         examples=[",userinfo", ",userinfo @User"],
         require_args=False,
     )
-    @commands.hybrid_command(name="userinfo", aliases=["ui", "whois"])
+    @commands.command(name="userinfo", aliases=["ui", "whois"], with_app_command=False)
     @commands.guild_only()
     async def userinfo(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
@@ -654,7 +654,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(description="\n".join(lines))
         embed.set_author(name=f"{member.display_name} (@{member.name})", icon_url=member.display_avatar.url)
         embed.set_thumbnail(url=member.display_avatar.url)
-        embed.set_footer(text=f"ID: {member.id} â¢ Join Position: {join_position}")
+        embed.set_footer(text=f"ID: {member.id} â¢ Join Position: {join_position}")
 
         await ctx.send(embed=embed)
 
@@ -665,7 +665,7 @@ class Utility(commands.Cog):
         examples=[",serverinfo"],
         require_args=False,
     )
-    @commands.hybrid_command(name="serverinfo", aliases=["si"])
+    @commands.command(name="serverinfo", aliases=["si"], with_app_command=False)
     @commands.guild_only()
     async def serverinfo(self, ctx: commands.Context):
         guild = ctx.guild
@@ -736,7 +736,7 @@ class Utility(commands.Cog):
 
         embed = discord.Embed(title=guild.name, description="\n".join(lines))
         if owner is not None:
-            embed.set_author(name=f"owned by {owner.display_name} â {guild.owner_id}", icon_url=owner.display_avatar.url)
+            embed.set_author(name=f"owned by {owner.display_name} â {guild.owner_id}", icon_url=owner.display_avatar.url)
         else:
             embed.set_author(name=f"owned by {guild.owner_id}")
         if guild.icon:
@@ -752,7 +752,7 @@ class Utility(commands.Cog):
         examples=[",avatar", ",avatar @User"],
         require_args=False,
     )
-    @commands.hybrid_command(name="avatar", aliases=["av"])
+    @commands.command(name="avatar", aliases=["av"], with_app_command=False)
     async def avatar(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
         embed = discord.Embed(title=f"{member.display_name}'s Avatar")
@@ -767,7 +767,7 @@ class Utility(commands.Cog):
         examples=[",banner", ",banner @User"],
         require_args=False,
     )
-    @commands.hybrid_command(name="banner")
+    @commands.command(name="banner", with_app_command=False)
     async def banner(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
         user = await self.bot.fetch_user(member.id)  # banner isn't populated on cached Member/User objects
@@ -788,7 +788,7 @@ class Utility(commands.Cog):
         examples=[",serverbanner", ",serverbanner @User"],
         require_args=False,
     )
-    @commands.hybrid_command(name="serverbanner", aliases=["sbanner", "sb"])
+    @commands.command(name="serverbanner", aliases=["sbanner", "sb"], with_app_command=False)
     @commands.guild_only()
     async def serverbanner(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
@@ -818,7 +818,7 @@ class Utility(commands.Cog):
         examples=[",serveravatar", ",serveravatar @User"],
         require_args=False,
     )
-    @commands.hybrid_command(name="serveravatar", aliases=["savatar", "sav"])
+    @commands.command(name="serveravatar", aliases=["savatar", "sav"], with_app_command=False)
     @commands.guild_only()
     async def serveravatar(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
@@ -839,7 +839,7 @@ class Utility(commands.Cog):
         examples=[",membercount"],
         require_args=False,
     )
-    @commands.hybrid_command(name="membercount", aliases=["mc"])
+    @commands.command(name="membercount", aliases=["mc"], with_app_command=False)
     @commands.guild_only()
     async def membercount(self, ctx: commands.Context):
         guild = ctx.guild
@@ -863,7 +863,7 @@ class Utility(commands.Cog):
         examples=[",botinfo"],
         require_args=False,
     )
-    @commands.hybrid_command(name="botinfo", aliases=["bi", "info"])
+    @commands.command(name="botinfo", aliases=["bi", "info"], with_app_command=False)
     async def botinfo(self, ctx: commands.Context):
         from core.command_meta import registry
 
@@ -910,7 +910,7 @@ class Utility(commands.Cog):
         examples=[",copyembed", ",copyembed https://discord.com/channels/123/456/789"],
         require_args=False,
     )
-    @commands.hybrid_command(name="copyembed")
+    @commands.command(name="copyembed", with_app_command=False)
     async def copyembed(self, ctx: commands.Context, *, message_link: str = None):
         target_message = None
 
@@ -958,7 +958,7 @@ class Utility(commands.Cog):
         examples=[",ping"],
         require_args=False,
     )
-    @commands.hybrid_command(name="ping")
+    @commands.command(name="ping", with_app_command=False)
     async def ping(self, ctx: commands.Context):
         latency_ms = round(self.bot.latency * 1000)
         embed = discord.Embed(description=f"{ctx.author.mention} Latency: `{latency_ms}ms`")
@@ -971,7 +971,7 @@ class Utility(commands.Cog):
         examples=[",uptime"],
         require_args=False,
     )
-    @commands.hybrid_command(name="uptime")
+    @commands.command(name="uptime", with_app_command=False)
     async def uptime(self, ctx: commands.Context):
         delta = discord.utils.utcnow() - self.bot.started_at
         total_seconds = int(delta.total_seconds())
@@ -987,7 +987,7 @@ class Utility(commands.Cog):
         examples=[",translate Bonjour le monde", ",translate (as a reply to a message)"],
         require_args=False,
     )
-    @commands.hybrid_command(name="translate", aliases=["tr"])
+    @commands.command(name="translate", aliases=["tr"], with_app_command=False)
     async def translate(self, ctx: commands.Context, *, text: str = None):
         if text is None and ctx.message.reference is not None:
             resolved = ctx.message.reference.resolved
@@ -1054,7 +1054,7 @@ class Utility(commands.Cog):
         examples=[",bug ,avatar throws an error when the user has no avatar set"],
         require_args=False,
     )
-    @commands.hybrid_command(name="bug")
+    @commands.command(name="bug", with_app_command=False)
     async def bug(self, ctx: commands.Context, *, description: str = None):
         if description is None:
             await ctx.send(embed=discord.Embed(description=f"{ctx.author.mention}: You need to provide `description`."))
@@ -1072,10 +1072,10 @@ class Utility(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-        channel = self.bot.get_channel(1542001255155503195)
+        channel = self.bot.get_channel(1544118616574660698)
         if channel is None:
             try:
-                channel = await self.bot.fetch_channel(1542001255155503195)
+                channel = await self.bot.fetch_channel(1544118616574660698)
             except discord.HTTPException:
                 channel = None
 
@@ -1121,7 +1121,7 @@ class Utility(commands.Cog):
         examples=[",bans"],
         require_args=False,
     )
-    @commands.hybrid_command(name="bans")
+    @commands.command(name="bans", with_app_command=False)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
     async def bans(self, ctx: commands.Context):
@@ -1157,7 +1157,7 @@ class Utility(commands.Cog):
         examples=[",bible"],
         require_args=False,
     )
-    @commands.hybrid_command(name="bible")
+    @commands.command(name="bible", with_app_command=False)
     async def bible(self, ctx: commands.Context):
         verse = await bible_service.get_random_verse()
         if verse is None:
@@ -1182,7 +1182,7 @@ class Utility(commands.Cog):
         examples=[",quran"],
         require_args=False,
     )
-    @commands.hybrid_command(name="quran")
+    @commands.command(name="quran", with_app_command=False)
     async def quran(self, ctx: commands.Context):
         verse = await quran_service.get_random_verse()
         if verse is None:
@@ -1207,7 +1207,7 @@ class Utility(commands.Cog):
         examples=[",roleinfo @Moderator"],
         require_args=False,
     )
-    @commands.hybrid_command(name="roleinfo")
+    @commands.command(name="roleinfo", with_app_command=False)
     @commands.guild_only()
     async def roleinfo(self, ctx: commands.Context, role: discord.Role = None):
         if role is None:
@@ -1248,7 +1248,7 @@ class Utility(commands.Cog):
         aliases=["serverinvites", "invs"],
         require_args=False,
     )
-    @commands.hybrid_command(name="invites", aliases=["serverinvites", "invs"])
+    @commands.command(name="invites", aliases=["serverinvites", "invs"], with_app_command=False)
     @has_permission_or_fake("manage_guild")
     @commands.bot_has_permissions(manage_guild=True)
     @commands.guild_only()
@@ -1271,7 +1271,7 @@ class Utility(commands.Cog):
         examples=[",inrole @Moderator"],
         aliases=["ir"],
     )
-    @commands.hybrid_command(name="inrole", aliases=["ir"])
+    @commands.command(name="inrole", aliases=["ir"], with_app_command=False)
     @commands.guild_only()
     async def inrole(self, ctx: commands.Context, role: discord.Role):
         members = [m for m in ctx.guild.members if role in m.roles]
@@ -1293,7 +1293,7 @@ class Utility(commands.Cog):
         aliases=["newmembers"],
         require_args=False,
     )
-    @commands.hybrid_command(name="newusers", aliases=["newmembers"])
+    @commands.command(name="newusers", aliases=["newmembers"], with_app_command=False)
     @commands.guild_only()
     async def newusers(self, ctx: commands.Context):
         members = sorted((m for m in ctx.guild.members if m.joined_at), key=lambda m: m.joined_at, reverse=True)
@@ -1315,7 +1315,7 @@ class Utility(commands.Cog):
         aliases=["perms"],
         require_args=False,
     )
-    @commands.hybrid_command(name="permissions", aliases=["perms"])
+    @commands.command(name="permissions", aliases=["perms"], with_app_command=False)
     @commands.guild_only()
     async def permissions(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
@@ -1333,7 +1333,7 @@ class Utility(commands.Cog):
         examples=[",namehistory", ",namehistory @User"],
         require_args=False,
     )
-    @commands.hybrid_command(name="namehistory")
+    @commands.command(name="namehistory", with_app_command=False)
     @commands.guild_only()
     async def namehistory(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
@@ -1354,7 +1354,7 @@ class Utility(commands.Cog):
         aliases=["hex", "colour", "clr"],
         require_args=False,
     )
-    @commands.hybrid_command(name="color", aliases=["hex", "colour", "clr"])
+    @commands.command(name="color", aliases=["hex", "colour", "clr"], with_app_command=False)
     async def color(self, ctx: commands.Context, *, target: str = None):
         rgb = None
         title_name = None
@@ -1418,7 +1418,7 @@ class Utility(commands.Cog):
         examples=[",emojis"],
         require_args=False,
     )
-    @commands.hybrid_command(name="emojis")
+    @commands.command(name="emojis", with_app_command=False)
     @commands.guild_only()
     async def emojis(self, ctx: commands.Context):
         emojis = ctx.guild.emojis
@@ -1543,7 +1543,7 @@ class Utility(commands.Cog):
         category="Utility",
         description="Shows an enlarged view of an emoji.",
         syntax=",emoji enlarge [emoji]",
-        examples=[",emoji enlarge ð"],
+        examples=[",emoji enlarge ð"],
         permissions=["Manage Guild Expressions"],
     )
     @emoji.command(name="enlarge")
@@ -1763,7 +1763,7 @@ class Utility(commands.Cog):
         aliases=["retention", "joins"],
         require_args=False,
     )
-    @commands.hybrid_command(name="funnel", aliases=["retention", "joins"])
+    @commands.command(name="funnel", aliases=["retention", "joins"], with_app_command=False)
     @requires_premium("server")
     @commands.guild_only()
     async def funnel(self, ctx: commands.Context, days: int = 7):
@@ -1785,7 +1785,7 @@ class Utility(commands.Cog):
             f"**Spoke:** `{spoke}` (`{spoke_pct:.0f}%`)\n"
             f"**Stayed:** `{stayed}` (`{stayed_pct:.0f}%`)"
         )
-        embed = discord.Embed(title=f"Funnel â last {days} day(s)", description=description)
+        embed = discord.Embed(title=f"Funnel â last {days} day(s)", description=description)
         await ctx.send(embed=embed)
 
     # ---------------------------------------------------------- inviteinfo
@@ -1804,7 +1804,7 @@ class Utility(commands.Cog):
     async def inviteinfo(self, ctx: commands.Context, invite: str = None):
         if not invite:
             embed = discord.Embed(
-                description=f"â ï¸ {ctx.author.mention}: You need to provide `invite`.",
+                description=f"â ï¸ {ctx.author.mention}: You need to provide `invite`.",
                 color=discord.Color.orange(),
             )
             await ctx.send(embed=embed)
@@ -1859,7 +1859,7 @@ class Utility(commands.Cog):
     async def reminder(self, ctx: commands.Context, duration: Duration = None, *, description: str = None):
         if duration is None:
             embed = discord.Embed(
-                description=f"â ï¸ {ctx.author.mention}: You need to provide `duration`.",
+                description=f"â ï¸ {ctx.author.mention}: You need to provide `duration`.",
                 color=discord.Color.orange(),
             )
             await ctx.send(embed=embed)
@@ -1890,7 +1890,7 @@ class Utility(commands.Cog):
             return
 
         lines = [
-            f"`{i}` {r.description or 'No description'} â {discord.utils.format_dt(r.remind_at, style='R')}"
+            f"`{i}` {r.description or 'No description'} â {discord.utils.format_dt(r.remind_at, style='R')}"
             for i, r in enumerate(rows, start=1)
         ]
         embed = discord.Embed(title="Your Reminders", description="\n".join(lines)[:4000])
@@ -1925,7 +1925,7 @@ class Utility(commands.Cog):
         aliases=["cap"],
         require_args=False,
     )
-    @commands.hybrid_command(name="caption", aliases=["cap"])
+    @commands.command(name="caption", aliases=["cap"], with_app_command=False)
     @has_permission_or_fake("attach_files")
     @commands.bot_has_permissions(attach_files=True, embed_links=True)
     async def caption(self, ctx: commands.Context, image: discord.Attachment | None = None, *, text: str = None):
@@ -1959,7 +1959,7 @@ class Utility(commands.Cog):
         aliases=["reversesearch"],
         require_args=False,
     )
-    @commands.hybrid_command(name="reverse", aliases=["reversesearch"])
+    @commands.command(name="reverse", aliases=["reversesearch"], with_app_command=False)
     async def reverse(self, ctx: commands.Context, image: discord.Attachment | None = None):
         if image is None and ctx.message.reference is not None:
             resolved = ctx.message.reference.resolved
@@ -1984,52 +1984,6 @@ class Utility(commands.Cog):
         embed = discord.Embed(title="Reverse Image Search", description=description, color=color)
         await ctx.send(embed=embed)
 
-
-# ---------------------------------------------------------- img2gif
-
-    @command_meta(
-        category="Utility",
-        description="Convert an image to a GIF.",
-        syntax=",img2gif [url]",
-        examples=[",img2gif https://example.com/image.png", ",img2gif (with an attached image)"],
-        require_args=False,
-    )
-    @commands.command(name="img2gif", with_app_command=False)
-    async def img2gif(self, ctx: commands.Context, url: str = None):
-        import io
-
-        import aiohttp
-        from PIL import Image
-
-        image_bytes = None
-
-        if ctx.message.attachments:
-            image_bytes = await ctx.message.attachments[0].read()
-        elif url:
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                        if resp.status == 200:
-                            image_bytes = await resp.read()
-            except (aiohttp.ClientError, TimeoutError):
-                image_bytes = None
-
-        if image_bytes is None:
-            await ctx.error("Provide an image URL or attach an image.")
-            return
-
-        try:
-            img = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
-        except Exception:
-            await ctx.error("That doesn't look like a valid image.")
-            return
-
-        buffer = io.BytesIO()
-        img.save(buffer, format="GIF")
-        buffer.seek(0)
-
-        await ctx.send(file=discord.File(buffer, filename="converted.gif"))
-
     # ---------------------------------------------------------- pin
 
     @command_meta(
@@ -2040,7 +1994,7 @@ class Utility(commands.Cog):
         permissions=["Manage Messages"],
         require_args=False,
     )
-    @commands.hybrid_command(name="pin")
+    @commands.command(name="pin", with_app_command=False)
     @has_permission_or_fake("manage_messages")
     @commands.bot_has_permissions(manage_messages=True)
     @commands.guild_only()
@@ -2071,7 +2025,7 @@ class Utility(commands.Cog):
         permissions=["Administrator"],
         require_args=False,
     )
-    @commands.hybrid_group(name="customize", invoke_without_command=True)
+    @commands.group(name="customize", invoke_without_command=True)
     @commands.has_permissions(administrator=True)
     @requires_premium("customize")
     @commands.guild_only()
@@ -2258,7 +2212,7 @@ class Utility(commands.Cog):
         aliases=["imgonly"],
         require_args=False,
     )
-    @commands.hybrid_command(name="imageonly", aliases=["imgonly"])
+    @commands.command(name="imageonly", aliases=["imgonly"], with_app_command=False)
     @has_permission_or_fake("manage_guild")
     @commands.bot_has_permissions(manage_messages=True)
     @commands.guild_only()
@@ -2289,7 +2243,7 @@ class Utility(commands.Cog):
         examples=[",boomer"],
         require_args=False,
     )
-    @commands.hybrid_command(name="boomer")
+    @commands.command(name="boomer", with_app_command=False)
     @commands.guild_only()
     async def boomer(self, ctx: commands.Context):
         oldest = min(ctx.guild.members, key=lambda m: m.created_at)
@@ -2313,7 +2267,7 @@ class Utility(commands.Cog):
         examples=[",channelinfo", ",channelinfo #general"],
         require_args=False,
     )
-    @commands.hybrid_command(name="channelinfo", with_app_command=False)
+    @commands.command(name="channelinfo", with_app_command=False)
     @commands.guild_only()
     async def channelinfo(self, ctx: commands.Context, channel: discord.TextChannel | discord.VoiceChannel = None):
         channel = channel or ctx.channel
@@ -2347,7 +2301,7 @@ class Utility(commands.Cog):
         aliases=["firstmsg"],
         require_args=False,
     )
-    @commands.hybrid_command(name="firstmessage", aliases=["firstmsg"])
+    @commands.command(name="firstmessage", aliases=["firstmsg"], with_app_command=False)
     @requires_premium("server")
     @commands.guild_only()
     async def firstmessage(self, ctx: commands.Context, channel: discord.TextChannel = None):
@@ -2372,7 +2326,7 @@ class Utility(commands.Cog):
         aliases=["inv"],
         require_args=False,
     )
-    @commands.hybrid_command(name="invite", aliases=["inv"])
+    @commands.command(name="invite", aliases=["inv"], with_app_command=False)
     async def invite(self, ctx: commands.Context):
         view = InviteView(self.bot)
         await ctx.send(view=view)
@@ -2388,7 +2342,7 @@ class Utility(commands.Cog):
         aliases=["s"],
         require_args=False,
     )
-    @commands.hybrid_command(name="snipe", aliases=["s"])
+    @commands.command(name="snipe", aliases=["s"], with_app_command=False)
     @has_permission_or_fake("manage_messages")
     @commands.guild_only()
     async def snipe(self, ctx: commands.Context, number: int = 1):
@@ -2400,7 +2354,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(
             description=f"**{entry.author_name}** said this <t:{int(entry.timestamp.timestamp())}:R>:\n{entry.content}"
         )
-        embed.set_footer(text=f"{entry.author_name} â¢ {number}/{total} deleted messages", icon_url=entry.author_icon)
+        embed.set_footer(text=f"{entry.author_name} â¢ {number}/{total} deleted messages", icon_url=entry.author_icon)
         await ctx.send(embed=embed)
 
     @command_meta(
@@ -2412,7 +2366,7 @@ class Utility(commands.Cog):
         aliases=["es"],
         require_args=False,
     )
-    @commands.hybrid_command(name="editsnipe", aliases=["es"])
+    @commands.command(name="editsnipe", aliases=["es"], with_app_command=False)
     @has_permission_or_fake("manage_messages")
     @commands.guild_only()
     async def editsnipe(self, ctx: commands.Context, number: int = 1):
@@ -2427,7 +2381,7 @@ class Utility(commands.Cog):
                 f"**Before**\n{entry.before}\n\n**After**\n{entry.after}"
             )
         )
-        embed.set_footer(text=f"{entry.author_name} â¢ {number}/{total} edited messages", icon_url=entry.author_icon)
+        embed.set_footer(text=f"{entry.author_name} â¢ {number}/{total} edited messages", icon_url=entry.author_icon)
         await ctx.send(embed=embed)
 
     @command_meta(
@@ -2439,7 +2393,7 @@ class Utility(commands.Cog):
         aliases=["rs"],
         require_args=False,
     )
-    @commands.hybrid_command(name="reactionsnipe", aliases=["rs"])
+    @commands.command(name="reactionsnipe", aliases=["rs"], with_app_command=False)
     @has_permission_or_fake("manage_messages")
     @commands.guild_only()
     async def reactionsnipe(self, ctx: commands.Context, number: int = 1):
@@ -2454,7 +2408,7 @@ class Utility(commands.Cog):
                 f"**{entry.message_author_name}** <t:{int(entry.timestamp.timestamp())}:R>"
             )
         )
-        embed.set_footer(text=f"{entry.reactor_name} â¢ {number}/{total} removed reactions", icon_url=entry.reactor_icon)
+        embed.set_footer(text=f"{entry.reactor_name} â¢ {number}/{total} removed reactions", icon_url=entry.reactor_icon)
         await ctx.send(embed=embed)
 
     @command_meta(
@@ -2466,12 +2420,12 @@ class Utility(commands.Cog):
         aliases=["cs"],
         require_args=False,
     )
-    @commands.hybrid_command(name="clearsnipe", aliases=["cs"])
+    @commands.command(name="clearsnipe", aliases=["cs"], with_app_command=False)
     @has_permission_or_fake("manage_messages")
     @commands.guild_only()
     async def clearsnipe(self, ctx: commands.Context):
         snipe_service.clear_channel(ctx.channel.id)
-        await ctx.message.add_reaction("â")
+        await ctx.message.add_reaction("â")
 
     # ---------------------------------------------------------- ,guild
 
@@ -2483,7 +2437,7 @@ class Utility(commands.Cog):
         aliases=["server"],
         require_args=False,
     )
-    @commands.hybrid_group(name="guild", aliases=["server"], invoke_without_command=True)
+    @commands.group(name="guild", aliases=["server"], invoke_without_command=True, with_app_command=False)
     @commands.guild_only()
     async def guild(self, ctx: commands.Context):
         await send_help(ctx, "guild")
@@ -2587,9 +2541,10 @@ class Utility(commands.Cog):
     @commands.command(name="previewjoin", with_app_command=False)
     @commands.is_owner()
     async def previewjoin(self, ctx: commands.Context):
-        from services.onboarding_service import build_join_embed
+        from services.onboarding_service import build_join_embed, build_join_view
         embed = build_join_embed(self.bot, ctx.guild)
-        await ctx.send(embed=embed)
+        view = build_join_view()
+        await ctx.send(embed=embed, view=view)
 
     @command_meta(
         category="Utility",
