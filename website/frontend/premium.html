@@ -27,21 +27,71 @@
           <a href="tickets.html">Tickets</a>
           <a data-support-link href="#">Discord</a>
           <a href="docs.html">Documentation</a>
+          <a href="premium.html">Premium</a>
         </nav>
       </div>
     </header>
 
-    <section class="hero">
-      <h1 class="reveal">blaid is completely free right now</h1>
-      <p class="lead reveal">
-        Every feature, every limit, every command - free for everyone while we rebuild Premium the right way.
-        Check back soon.
-      </p>
-      <div class="actions reveal">
-        <a class="btn primary" data-invite-link href="#">Invite to Discord</a>
-        <a class="btn secondary" href="commands.html">Commands</a>
-      </div>
+    <section class="hero" style="padding-bottom: 20px;">
+      <h1 class="reveal">blaid Premium</h1>
+      <p class="lead reveal">Two independent plans, purchased entirely through Discord's own checkout - we never see your payment details.</p>
     </section>
+
+    <div class="how-to-get reveal" style="max-width: 640px; margin: 0 auto 40px;">
+      <p class="how-to-eyebrow">How to get Premium</p>
+      <p class="how-to-step">Run <code>,premium</code> in your server, pick a plan, and click the purchase button - Discord handles the checkout, and Premium activates automatically the moment payment goes through.</p>
+    </div>
+
+    <div class="plans-grid">
+      <div class="plan-card featured reveal">
+        <h3>Server Premium</h3>
+        <p class="plan-blurb">Raises limits and unlocks premium-only features for your whole server.</p>
+        <div class="plan-price-row"><span class="amount">$4.99</span><span class="period">/ month</span></div>
+        <p style="color: var(--text-faint); font-size: 0.8rem; margin: 0 0 4px;">or $11.99 once, for life</p>
+        <ul class="plan-features">
+          <li>Higher limits (autoresponders, reaction roles, log channels, ticket panels, level rewards)</li>
+          <li>Funnel tracking, verification gate, selfpurge, Twitch alerts</li>
+          <li>Full server backups</li>
+        </ul>
+        <a class="btn primary" href="https://discord.com/application-directory/1494684216267378800/store" target="_blank" style="width: 100%;">Get Server Premium</a>
+      </div>
+
+      <div class="plan-card reveal">
+        <h3>Customize</h3>
+        <p class="plan-blurb">Give blaid a custom identity just for your server.</p>
+        <div class="plan-price-row"><span class="amount">$3.99</span><span class="period">/ month</span></div>
+        <p style="color: var(--text-faint); font-size: 0.8rem; margin: 0 0 4px;">or $5.49 once, for life</p>
+        <ul class="plan-features">
+          <li>Custom name, avatar, and banner for blaid in your server</li>
+          <li>Custom About Me text on blaid's profile</li>
+        </ul>
+        <a class="btn secondary" href="https://discord.com/application-directory/1494684216267378800/store" target="_blank" style="width: 100%;">Get Customize</a>
+      </div>
+    </div>
+
+    <div class="refund-policy">
+      <h2>Refund Policy</h2>
+
+      <div class="refund-section">
+        <h3>Monthly Subscriptions</h3>
+        <p>You can cancel anytime from your Discord Settings → Subscriptions → Premium App Subscriptions. Cancelling stops future billing, but the current paid period stays active until it ends - no partial refund for time already paid for. If you believe you were charged in error, contact us within 7 days of the charge.</p>
+      </div>
+
+      <div class="refund-section">
+        <h3>Lifetime (One-Time) Purchases</h3>
+        <p>Lifetime purchases are final and non-refundable once premium has been activated on your server, per Discord's own Premium Apps policy. If the purchase failed to activate premium within 24 hours, contact us and we'll look into it.</p>
+      </div>
+
+      <div class="refund-section">
+        <h3>How Billing Works</h3>
+        <p>All payments are processed entirely by Discord - we never see or store your card details. Manage payment methods, view receipts, and cancel subscriptions directly from your Discord User Settings → Billing.</p>
+      </div>
+
+      <div class="refund-section">
+        <h3>Contact</h3>
+        <p>For billing issues, refund requests, or questions, reach out in our support server or DM the bot owner directly.</p>
+      </div>
+    </div>
 
     <footer class="site-footer">
       <div class="footer-inner">
@@ -49,7 +99,8 @@
         <div class="footer-links">
           <a data-support-link href="#">Support Server</a>
           <a href="docs.html">Documentation</a>
-          <a href="commands.html">Commands</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
         </div>
       </div>
     </footer>
