@@ -455,10 +455,6 @@ class Moderation(commands.Cog):
             description=f"{ctx.author.mention}: **Blocked Permissions**: {', '.join(f'`{p}`' for p in denied)}"
         ))
 
-    @denyperm.command(name="help")
-    async def denyperm_help(self, ctx: commands.Context):
-        await send_help(ctx, "denyperm")
-
     @command_meta(
         category="Moderation",
         description="Blocks a permission from being assigned via role commands.",
@@ -620,10 +616,6 @@ class Moderation(commands.Cog):
                     )
             except discord.Forbidden:
                 pass
-
-    @warn.command(name="help")
-    async def warn_help(self, ctx: commands.Context):
-        await send_help(ctx, "warn")
 
     @command_meta(
         category="Moderation",
@@ -1154,10 +1146,6 @@ class Moderation(commands.Cog):
     async def verification(self, ctx: commands.Context):
         await send_help(ctx, "verification")
 
-    @verification.command(name="help")
-    async def verification_help(self, ctx: commands.Context):
-        await send_help(ctx, "verification")
-
     @command_meta(
         category="Moderation",
         description="Create a quarantine role locked to a channel, then turn the verification gate on.",
@@ -1388,10 +1376,6 @@ class Moderation(commands.Cog):
             await confirmation.delete(delay=2)
             return
         await _run_purge(ctx, amount, None)
-
-    @purge.command(name="help")
-    async def purge_help(self, ctx: commands.Context):
-        await send_help(ctx, "purge")
 
     @command_meta(
         category="Moderation",
@@ -1792,10 +1776,6 @@ class Moderation(commands.Cog):
             action_type="lock", reason=None,
         )
         await ctx.message.add_reaction("🔒")
-
-    @lockdown.command(name="help")
-    async def lockdown_help(self, ctx: commands.Context):
-        await send_help(ctx, "lockdown")
 
     @command_meta(
         category="Moderation",
