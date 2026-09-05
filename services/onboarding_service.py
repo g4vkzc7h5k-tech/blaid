@@ -1,5 +1,10 @@
-"""Builds the embed shown when Blade joins a new server - posted in a
-random channel the bot can talk in, and DMed to whoever added it."""
+"""Builds the join message shown when Blade joins a new server - posted
+in a random channel the bot can talk in, and DMed to whoever added it.
+
+Uses Components V2 (LayoutView/Container) instead of a classic embed,
+matching the same pattern as ,invite's InviteView - text and buttons
+live inside one seamless container rather than an embed with a
+separate button row underneath."""
 
 from __future__ import annotations
 
@@ -9,12 +14,12 @@ DOCS_URL = "https://blaid.best/docs.html"
 SUPPORT_URL = "https://discord.gg/blaid"
 
 
-def build_join_embed(bot: discord.Client, guild: discord.Guild) -> discord.Embed:
+def _build_description(bot: discord.Client, guild: discord.Guild) -> str:
     from core.command_meta import registry
 
     command_count = registry.count()
     name = bot.user.name
-    description = (
+    return (
         f"Thank you for adding **{name}** to **{guild.name}**. {name} is a multipurpose "
         f"Discord bot with over **{command_count:,}** commands aimed at making your Discord "
         f"experience seamless, hassle-free and fun. If you need help you can "
@@ -27,16 +32,27 @@ def build_join_embed(bot: discord.Client, guild: discord.Guild) -> discord.Embed
         f"> `,filter add` — Adds a word to the chat filter to start moderating automatically\n"
         f"> `,help antinuke` — Shows how to protect your server from nukes and raids"
     )
-    return discord.Embed(description=description)
 
 
-def build_join_view() -> discord.ui.View:
-    """Link buttons shown alongside the join embed - Documentation and
-    Discord Server, both plain link buttons (no callback needed)."""
-    view = discord.ui.View(timeout=None)
-    view.add_item(discord.ui.Button(label="Documentation", style=discord.ButtonStyle.link, url=DOCS_URL))
-    view.add_item(discord.ui.Button(label="Discord Server", style=discord.ButtonStyle.link, url=SUPPORT_URL))
-    return view
+class JoinView(discord.ui.LayoutView):
+    """Components V2 layout for the join message - description and the
+    Documentation/Discord Server buttons all inside one container."""
+
+    def __init__(self, bot: discord.Client, guild: discord.Guild):
+        super().__init__(timeout=None)
+
+        docs_button = discord.ui.Button(label="Documentation", style=discord.ButtonStyle.link, url=DOCS_URL)
+        support_button = discord.ui.Button(label="Discord Server", style=discord.ButtonStyle.link, url=SUPPORT_URL)
+
+        container = discord.ui.Container(
+            discord.ui.TextDisplay(_build_description(bot, guild)),
+            discord.ui.ActionRow(docs_button, support_button),
+        )
+        self.add_item(container)
+
+
+def build_join_view(bot: discord.Client, guild: discord.Guild) -> "JoinView":
+    return JoinView(bot, guild)
 
 
 def _pick_channel(guild: discord.Guild) -> discord.TextChannel | None:
@@ -68,19 +84,18 @@ async def _find_inviter(guild: discord.Guild) -> discord.User | None:
 
 
 async def handle_guild_join(bot: discord.Client, guild: discord.Guild) -> None:
-    embed = build_join_embed(bot, guild)
-    view = build_join_view()
+    view = build_join_view(bot, guild)
 
     channel = _pick_channel(guild)
     if channel is not None:
         try:
-            await channel.send(embed=embed, view=view)
+            await channel.send(view=view)
         except discord.HTTPException:
             pass
 
     inviter = await _find_inviter(guild)
     if inviter is not None:
         try:
-            await inviter.send(embed=embed, view=view)
+            await inviter.send(view=view)
         except discord.HTTPException:
             pass
