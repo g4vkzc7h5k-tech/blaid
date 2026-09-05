@@ -2541,10 +2541,9 @@ class Utility(commands.Cog):
     @commands.command(name="previewjoin", with_app_command=False)
     @commands.is_owner()
     async def previewjoin(self, ctx: commands.Context):
-        from services.onboarding_service import build_join_embed, build_join_view
-        embed = build_join_embed(self.bot, ctx.guild)
-        view = build_join_view()
-        await ctx.send(embed=embed, view=view)
+        from services.onboarding_service import build_join_view
+        view = build_join_view(self.bot, ctx.guild)
+        await ctx.send(view=view)
 
     @command_meta(
         category="Utility",
