@@ -903,24 +903,6 @@ class Security(commands.Cog):
         else:
             await ctx.error("No honeypot is configured.")
 
-    @command_meta(
-        category="Security",
-        description="Toggles the join gate, which kicks accounts newer than the configured minimum age.",
-        syntax=",joingate <on|off> [min_age_hours]",
-        examples=[",joingate on 24"],
-        permissions=["Administrator"],
-    )
-    @commands.command(name="joingate")
-    @has_permission_or_fake("administrator")
-    @commands.guild_only()
-    async def joingate(self, ctx: commands.Context, state: str, min_age_hours: int = 24):
-        enabled = state.lower() in ("on", "true", "enable", "enabled")
-        async with get_session() as session:
-            cfg = await security_repository.get_or_create_antinuke_config(session, ctx.guild.id)
-            cfg.join_gate_enabled = enabled
-            cfg.join_gate_min_account_age_hours = max(0, min_age_hours)
-            await session.commit()
-        await ctx.success(f"Join gate is now **{'on' if enabled else 'off'}** (min account age: {min_age_hours}h).")
 
     # ---------------------------------------------------------- ,fakepermissions
 
