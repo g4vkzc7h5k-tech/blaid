@@ -16,6 +16,7 @@ log = logging.getLogger("blade.bot")
 INITIAL_COGS = [
     "cogs.moderation.moderation",
     "cogs.fun.fun",
+    "cogs.fun.tictactoe",
     "cogs.levels.levels",
     "cogs.tickets.tickets",
     "cogs.voicemaster.voicemaster",
@@ -40,7 +41,7 @@ INITIAL_COGS = [
     "cogs.twitch.twitch",
     "cogs.youtube.youtube",
     "cogs.pingonjoin.pingonjoin",
-    # "cogs.premium.premium",  # temporarily disabled - premium purchasing isn't ready yet, see premium_service.py
+    "cogs.premium.premium",
     "cogs.schedule.schedule",
     "cogs.lastfm.lastfm",
     "cogs.autopfp.autopfp",
@@ -216,11 +217,6 @@ class Blade(commands.Bot):
         resolved = await alias_service.resolve(message.guild.id, alias_name, remaining)
         if resolved is None:
             return None
-
-        return f"{prefix}{resolved}"
-
-    async def on_command_error(self, ctx: commands.Context, error: Exception) -> None:
-        await handle_command_error(ctx, error)
 
         return f"{prefix}{resolved}"
 
