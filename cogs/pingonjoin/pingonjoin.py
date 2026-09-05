@@ -8,7 +8,6 @@ from discord.ext import commands
 
 from core.checks import has_permission_or_fake
 from core.command_meta import command_meta
-from core.help_formatter import send_help
 from core.script_parser import parse_script
 from core.variables import resolve_variables
 from database.database import get_session
@@ -72,7 +71,7 @@ class PingOnJoin(commands.Cog):
         aliases=["poj"],
         require_args=False,
     )
-    @commands.hybrid_group(name="pingonjoin", aliases=["poj"], invoke_without_command=True)
+    @commands.group(name="pingonjoin", aliases=["poj"], invoke_without_command=True, with_app_command=False)
     @has_permission_or_fake("manage_guild")
     @commands.guild_only()
     async def pingonjoin(self, ctx: commands.Context):
@@ -88,10 +87,6 @@ class PingOnJoin(commands.Cog):
             return
 
         await self._send_config_embed(ctx, cfg)
-
-    @pingonjoin.command(name="help")
-    async def pingonjoin_help(self, ctx: commands.Context):
-        await send_help(ctx, "pingonjoin")
 
     # ---------------------------------------------------------- enable / disable / info
 
