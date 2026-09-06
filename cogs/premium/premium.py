@@ -61,6 +61,7 @@ class Premium(commands.Cog):
     @commands.group(name="premium", with_app_command=False, invoke_without_command=True)
     @commands.guild_only()
     async def premium(self, ctx: commands.Context):
+        premium_service.record_purchase_intent(ctx.author.id, ctx.guild.id)
         view = premium_service.ChoosePlanView()
         await ctx.send(view=view)
 
