@@ -18,15 +18,22 @@ confirms the purchase, it fires an Entitlement event over the gateway
 applies directly to this guild's PremiumConfig row - no manual
 approval step anymore.
 
-HONEST GAP: whether a Durable (lifetime) SKU's resulting Entitlement
-reliably carries guild_id when purchased via a button clicked inside a
-guild channel is something to verify against a real purchase, since
-Discord's docs describe this scenario incompletely as of this
-writing. If a lifetime purchase doesn't grant premium automatically,
-check entitlement.guild_id here first - the sync/apply logic below
-falls back to look up the guild from the interaction that shows the
-button as a mitigation, but that fallback only works at the moment of
-purchase, not for the periodic full-entitlement sync.
+CONFIRMED (via live test purchase): a Durable (Lifetime) SKU's
+resulting Entitlement always has guild_id=None - Discord scopes
+one-time purchases to the purchasing USER, never to a guild, even
+when bought from a button inside a server. Guild Subscription
+(Monthly) entitlements DO carry guild_id directly, no issue there.
+The fix: record_purchase_intent() is called from ,premium right
+before showing the purchase buttons, remembering which guild the user
+was in; apply_entitlement() falls back to that when guild_id is
+missing. This is an in-memory, best-effort mapping (see its docstring
+for the exact tradeoff) - it does NOT help sync_entitlements() on
+startup, since a restart loses the in-memory intent. If a lifetime
+purchase's entitlement is picked up by the startup sync rather than
+the live gateway event (e.g. the bot was offline at purchase time)
+and its guild_id is still None with no intent on file, it won't
+auto-apply - the owner-only ,premium approve command exists for
+exactly this kind of manual fix-up.
 """
 
 from __future__ import annotations
@@ -179,6 +186,8 @@ class GetPremiumView(discord.ui.LayoutView):
         self.add_item(container)
 
     async def _on_get_premium(self, interaction: discord.Interaction) -> None:
+        if interaction.guild_id is not None:
+            record_purchase_intent(interaction.user.id, interaction.guild_id)
         plan = self.preselected_plan or "server"
         await interaction.response.send_message(view=PlanPurchaseView(plan), ephemeral=True)
 
@@ -253,6 +262,38 @@ class PlanPurchaseView(discord.ui.LayoutView):
 
 # ---------------------------------------------------------- entitlement handling
 
+# user_id -> (guild_id, recorded_at) - remembers which server someone
+# ran ,premium in most recently. Needed because a Durable (Lifetime)
+# purchase's resulting Entitlement is scoped to the USER, never the
+# guild (confirmed via live testing - Discord's own behavior, not a
+# bug here), unlike a Guild Subscription (Monthly) entitlement which
+# does carry guild_id directly. This is an in-memory best-effort
+# fallback - if the bot restarts between someone running ,premium and
+# completing checkout, the intent is lost and they'd need to run
+# ,premium again before buying.
+_pending_purchase_intent: dict[int, tuple[int, datetime.datetime]] = {}
+
+# How long a recorded intent stays valid - generous, since someone
+# might sit on the purchase screen for a while before paying.
+_INTENT_TTL = datetime.timedelta(hours=1)
+
+
+def record_purchase_intent(user_id: int, guild_id: int) -> None:
+    """Call this right when ,premium is run in a guild, before showing
+    the purchase buttons."""
+    _pending_purchase_intent[user_id] = (guild_id, _now())
+
+
+def _consume_purchase_intent(user_id: int) -> int | None:
+    entry = _pending_purchase_intent.get(user_id)
+    if entry is None:
+        return None
+    guild_id, recorded_at = entry
+    if _now() - recorded_at > _INTENT_TTL:
+        _pending_purchase_intent.pop(user_id, None)
+        return None
+    return guild_id
+
 async def _set_premium(guild_id: int, plan: str, *, active: bool, expires_at: datetime.datetime | None) -> None:
     async with get_session() as session:
         result = await session.execute(select(PremiumConfig).where(PremiumConfig.guild_id == guild_id))
@@ -275,22 +316,43 @@ async def apply_entitlement(bot: commands.Bot, entitlement: discord.Entitlement,
     """Called from on_entitlement_create/update/delete. Grants or
     revokes the matching plan for whichever guild this entitlement
     belongs to."""
+    import logging
+    log = logging.getLogger("blade.premium")
+    log.info(
+        "Entitlement event: sku_id=%s guild_id=%s user_id=%s active=%s ends_at=%s",
+        entitlement.sku_id, entitlement.guild_id, entitlement.user_id, active,
+        getattr(entitlement, "ends_at", None),
+    )
+
     mapping = SKU_MAP.get(entitlement.sku_id)
     if mapping is None:
+        log.warning("Entitlement sku_id %s not in SKU_MAP - ignoring.", entitlement.sku_id)
         return  # a SKU we don't recognize - ignore
     plan, period = mapping
 
     guild_id = entitlement.guild_id
     if guild_id is None:
-        # Not guild-scoped for some reason (see the HONEST GAP note at
-        # the top of this file) - nothing we can apply this to.
+        # Durable (Lifetime) purchases are user-scoped, not
+        # guild-scoped - fall back to whichever guild this user most
+        # recently ran ,premium in.
+        guild_id = _consume_purchase_intent(entitlement.user_id)
+
+    if guild_id is None:
+        log.warning(
+            "Entitlement for sku_id %s (plan=%s) has no guild_id and no recent ,premium "
+            "intent on file for user_id=%s - cannot grant premium. They may need to run "
+            "`,premium` again in the target server before purchasing.",
+            entitlement.sku_id, plan, entitlement.user_id,
+        )
         return
+
 
     expires_at = None
     if period == "monthly" and active:
         expires_at = entitlement.ends_at  # Discord auto-renews unless cancelled; this just tracks the current period
 
     await _set_premium(guild_id, plan, active=active, expires_at=expires_at)
+    log.info("Applied %s premium (active=%s) to guild %s", plan, active, guild_id)
 
     if active:
         guild = bot.get_guild(guild_id)
