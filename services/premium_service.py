@@ -219,7 +219,8 @@ class ChoosePlanView(discord.ui.LayoutView):
         container = discord.ui.Container(
             discord.ui.TextDisplay("# Choose what to buy"),
             discord.ui.TextDisplay(
-                "**Server Premium** covers everyone here.\n**Customize** unlocks branding for this server."
+                "**Server Premium** covers everyone here.\n**Customize** unlocks branding for this server.\n\n"
+                "-# Purchasing only works on Discord web or desktop right now, not the mobile app."
             ),
             discord.ui.Separator(visible=True),
             discord.ui.ActionRow(server_button, customize_button),
@@ -255,7 +256,7 @@ class PlanPurchaseView(discord.ui.LayoutView):
             discord.ui.Separator(visible=True),
             discord.ui.ActionRow(monthly_button),
             discord.ui.ActionRow(lifetime_button),
-            discord.ui.TextDisplay("-# Premium unlocks automatically right after checkout."),
+            discord.ui.TextDisplay("-# Premium unlocks automatically right after checkout. Purchasing only works on Discord web or desktop, not mobile."),
         )
         self.add_item(container)
 
