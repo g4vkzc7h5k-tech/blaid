@@ -280,6 +280,13 @@ body::before {
     margin-bottom: 6px;
     border-bottom: 1px solid var(--border-soft);
   }
+
+  /* .nav-panel lives inside .topbar, which creates its own stacking
+     context (position: sticky + z-index) - without raising .topbar's
+     z-index above the backdrop's, the backdrop paints over the whole
+     header including the menu nested inside it, no matter what
+     z-index .nav-panel itself has. */
+  .topbar { z-index: 46; }
 }
 
 .dot-panel {
