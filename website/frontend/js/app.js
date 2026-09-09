@@ -749,15 +749,191 @@ function initSiteLoginChip() {
 // NOTE: language switching is UI-only for now - it remembers the
 // choice but doesn't yet translate any page content. Wiring up real
 // translations is a separate piece of work.
+// Translations - keyed by [data-i18n="key"] on any element. Only the
+// shared nav/footer plus the Home and Premium pages are covered so
+// far; every other page's content still shows English regardless of
+// the selected language until it gets the same data-i18n treatment.
+const TRANSLATIONS = {
+  en: {
+    docs_cat_start: "GETTING STARTED", docs_cat_security: "SECURITY", docs_cat_serverconfig: "SERVER CONFIGURATION",
+    docs_cat_misc: "MISCELLANEOUS", docs_cat_resources: "RESOURCES", docs_cat_reference: "REFERENCE", docs_cat_premium: "PREMIUM",
+    docs_crumb: "Docs", docs_search_ph: "Search docs...",
+    tix_title: "Ticket Builder", tix_lead: "Build a full ticket panel - options, forms, and all - visually, and send it straight to your server.",
+    tix_login_eyebrow: "Log in to get started", tix_login_step: "Sign in with Discord to pick a server you manage and build a ticket panel for it.",
+    tix_login_btn: "Login with Discord",
+    cmds_title: "Commands", cmds_search_ph: "Search commands...",
+    status_title: "Status", status_checking: "Checking...", status_servers: "Servers",
+    status_users: "Users", status_latency: "Latency", status_uptime: "Uptime",
+    vars_title: "Variables", vars_lead: "Use these inside welcome, goodbye, boost, ticket, and level-up messages. Unknown placeholders are left untouched.",
+    eb_title: "Embed Builder", eb_lead: "Build a Discord embed, preview it exactly as it renders in Discord, and copy blaid's own script format into any command that accepts a custom script.",
+    eb_live_preview: "Live preview", eb_copy_script: "Copy Script",
+    nav_home: "Home", nav_commands: "Commands", nav_embed_builder: "Embed Builder",
+    nav_status: "Status", nav_tickets: "Tickets", nav_discord: "Discord",
+    nav_docs: "Documentation", nav_premium: "Premium",
+    footer_support: "Support Server", footer_privacy: "Privacy", footer_terms: "Terms",
+    home_title: "blaid is Discord's premier all-in-one app",
+    home_lead: "Meet the leading bot for management and engagement. Built to elevate your community's experience, streamline server management, and provide you access to premium resources for every necessity.",
+    home_invite_btn: "Invite to Discord",
+    premium_title: "blaid Premium",
+    premium_lead: "Two independent plans, purchased entirely through Discord's own checkout - we never see your payment details.",
+    premium_howto_eyebrow: "How to get Premium",
+    premium_howto_step: "Run ,premium in your server, pick a plan, and click the purchase button - Discord handles the checkout, and Premium activates automatically the moment payment goes through.",
+    premium_server_name: "Server Premium",
+    premium_server_blurb: "Raises limits and unlocks premium-only features for your whole server.",
+    premium_customize_name: "Customize",
+    premium_customize_blurb: "Give blaid a custom identity just for your server.",
+    premium_get_server: "Get Server Premium",
+    premium_get_customize: "Get Customize",
+  },
+  de: {
+    docs_cat_start: "ERSTE SCHRITTE", docs_cat_security: "SICHERHEIT", docs_cat_serverconfig: "SERVER-EINSTELLUNGEN",
+    docs_cat_misc: "SONSTIGES", docs_cat_resources: "RESSOURCEN", docs_cat_reference: "REFERENZ", docs_cat_premium: "PREMIUM",
+    docs_crumb: "Doku", docs_search_ph: "Doku durchsuchen...",
+    tix_title: "Ticket-Baukasten", tix_lead: "Baut ein komplettes Ticket-Panel - Options, Formulare, alles - visuell, und schickt es direkt an euren Server.",
+    tix_login_eyebrow: "Loggt euch ein, um loszulegen", tix_login_step: "Meldet euch mit Discord an, um einen Server auszuwählen, den ihr verwaltet, und baut ein Ticket-Panel dafür.",
+    tix_login_btn: "Mit Discord anmelden",
+    cmds_title: "Befehle", cmds_search_ph: "Befehle durchsuchen...",
+    status_title: "Status", status_checking: "Wird geprüft...", status_servers: "Server",
+    status_users: "Nutzer", status_latency: "Latenz", status_uptime: "Laufzeit",
+    vars_title: "Variablen", vars_lead: "Diese könnt ihr in Willkommens-, Abschieds-, Boost-, Ticket- und Level-Up-Nachrichten verwenden. Unbekannte Platzhalter bleiben unverändert.",
+    eb_title: "Embed-Baukasten", eb_lead: "Baut ein Discord-Embed, seht die Vorschau genau so, wie es in Discord aussieht, und kopiert blaids eigenen Script-Code in jeden Befehl, der ein eigenes Script akzeptiert.",
+    eb_live_preview: "Live-Vorschau", eb_copy_script: "Script kopieren",
+    nav_home: "Start", nav_commands: "Befehle", nav_embed_builder: "Embed-Baukasten",
+    nav_status: "Status", nav_tickets: "Tickets", nav_discord: "Discord",
+    nav_docs: "Dokumentation", nav_premium: "Premium",
+    footer_support: "Support-Server", footer_privacy: "Datenschutz", footer_terms: "AGB",
+    home_title: "blaid ist Discords führende All-in-One-App",
+    home_lead: "Der führende Bot für Verwaltung und Engagement. Entwickelt, um das Erlebnis eurer Community zu verbessern, die Serververwaltung zu vereinfachen und euch Zugang zu Premium-Funktionen für jeden Bedarf zu geben.",
+    home_invite_btn: "Zu Discord einladen",
+    premium_title: "blaid Premium",
+    premium_lead: "Zwei unabhängige Pläne, komplett über Discords eigene Kaufabwicklung - wir sehen eure Zahlungsdaten nie.",
+    premium_howto_eyebrow: "So bekommt ihr Premium",
+    premium_howto_step: "Führt ,premium in eurem Server aus, wählt einen Plan, und klickt auf den Kaufen-Knopf - Discord übernimmt die Bezahlung, und Premium wird automatisch freigeschaltet, sobald die Zahlung durch ist.",
+    premium_server_name: "Server Premium",
+    premium_server_blurb: "Erhöht Limits und schaltet Premium-Funktionen für euren ganzen Server frei.",
+    premium_customize_name: "Customize",
+    premium_customize_blurb: "Gebt blaid eine eigene Identität nur für euren Server.",
+    premium_get_server: "Server Premium holen",
+    premium_get_customize: "Customize holen",
+  },
+  fr: {
+    docs_cat_start: "PREMIERS PAS", docs_cat_security: "SÉCURITÉ", docs_cat_serverconfig: "CONFIGURATION DU SERVEUR",
+    docs_cat_misc: "DIVERS", docs_cat_resources: "RESSOURCES", docs_cat_reference: "RÉFÉRENCE", docs_cat_premium: "PREMIUM",
+    docs_crumb: "Docs", docs_search_ph: "Rechercher dans la doc...",
+    tix_title: "Créateur de tickets", tix_lead: "Créez un panneau de tickets complet - options, formulaires, tout - visuellement, et envoyez-le directement sur votre serveur.",
+    tix_login_eyebrow: "Connectez-vous pour commencer", tix_login_step: "Connectez-vous avec Discord pour choisir un serveur que vous gérez et créer un panneau de tickets pour celui-ci.",
+    tix_login_btn: "Se connecter avec Discord",
+    cmds_title: "Commandes", cmds_search_ph: "Rechercher des commandes...",
+    status_title: "Statut", status_checking: "Vérification...", status_servers: "Serveurs",
+    status_users: "Utilisateurs", status_latency: "Latence", status_uptime: "Disponibilité",
+    vars_title: "Variables", vars_lead: "À utiliser dans les messages de bienvenue, d'adieu, de boost, de ticket et de passage de niveau. Les paramètres inconnus restent inchangés.",
+    eb_title: "Créateur d'embed", eb_lead: "Créez un embed Discord, prévisualisez-le exactement comme il apparaîtra sur Discord, et copiez le format de script propre à blaid dans toute commande qui accepte un script personnalisé.",
+    eb_live_preview: "Aperçu en direct", eb_copy_script: "Copier le script",
+    nav_home: "Accueil", nav_commands: "Commandes", nav_embed_builder: "Créateur d'embed",
+    nav_status: "Statut", nav_tickets: "Tickets", nav_discord: "Discord",
+    nav_docs: "Documentation", nav_premium: "Premium",
+    footer_support: "Serveur de support", footer_privacy: "Confidentialité", footer_terms: "Conditions",
+    home_title: "blaid est l'application tout-en-un incontournable de Discord",
+    home_lead: "Découvrez le bot de référence pour la gestion et l'engagement. Conçu pour améliorer l'expérience de votre communauté, simplifier la gestion du serveur et vous donner accès à des fonctionnalités premium pour chaque besoin.",
+    home_invite_btn: "Inviter sur Discord",
+    premium_title: "blaid Premium",
+    premium_lead: "Deux plans indépendants, achetés entièrement via le paiement natif de Discord - nous ne voyons jamais vos informations de paiement.",
+    premium_howto_eyebrow: "Comment obtenir Premium",
+    premium_howto_step: "Exécutez ,premium sur votre serveur, choisissez un plan et cliquez sur le bouton d'achat - Discord gère le paiement, et Premium s'active automatiquement dès que le paiement est validé.",
+    premium_server_name: "Server Premium",
+    premium_server_blurb: "Augmente les limites et débloque des fonctionnalités premium pour tout votre serveur.",
+    premium_customize_name: "Customize",
+    premium_customize_blurb: "Donnez à blaid une identité personnalisée, propre à votre serveur.",
+    premium_get_server: "Obtenir Server Premium",
+    premium_get_customize: "Obtenir Customize",
+  },
+  es: {
+    docs_cat_start: "PRIMEROS PASOS", docs_cat_security: "SEGURIDAD", docs_cat_serverconfig: "CONFIGURACIÓN DEL SERVIDOR",
+    docs_cat_misc: "VARIOS", docs_cat_resources: "RECURSOS", docs_cat_reference: "REFERENCIA", docs_cat_premium: "PREMIUM",
+    docs_crumb: "Docs", docs_search_ph: "Buscar en la documentación...",
+    tix_title: "Creador de tickets", tix_lead: "Crea un panel de tickets completo - opciones, formularios, todo - visualmente, y envíalo directamente a tu servidor.",
+    tix_login_eyebrow: "Inicia sesión para empezar", tix_login_step: "Inicia sesión con Discord para elegir un servidor que administres y crear un panel de tickets para él.",
+    tix_login_btn: "Iniciar sesión con Discord",
+    cmds_title: "Comandos", cmds_search_ph: "Buscar comandos...",
+    status_title: "Estado", status_checking: "Comprobando...", status_servers: "Servidores",
+    status_users: "Usuarios", status_latency: "Latencia", status_uptime: "Tiempo activo",
+    vars_title: "Variables", vars_lead: "Úsalas en mensajes de bienvenida, despedida, boost, tickets y subida de nivel. Los marcadores desconocidos se dejan sin cambios.",
+    eb_title: "Creador de embeds", eb_lead: "Crea un embed de Discord, previsualízalo exactamente como se verá en Discord, y copia el formato de script propio de blaid en cualquier comando que acepte un script personalizado.",
+    eb_live_preview: "Vista previa en vivo", eb_copy_script: "Copiar script",
+    nav_home: "Inicio", nav_commands: "Comandos", nav_embed_builder: "Creador de embeds",
+    nav_status: "Estado", nav_tickets: "Tickets", nav_discord: "Discord",
+    nav_docs: "Documentación", nav_premium: "Premium",
+    footer_support: "Servidor de soporte", footer_privacy: "Privacidad", footer_terms: "Términos",
+    home_title: "blaid es la app todo-en-uno líder de Discord",
+    home_lead: "Conoce el bot líder en gestión y participación. Diseñado para mejorar la experiencia de tu comunidad, simplificar la gestión del servidor y darte acceso a funciones premium para cada necesidad.",
+    home_invite_btn: "Invitar a Discord",
+    premium_title: "blaid Premium",
+    premium_lead: "Dos planes independientes, comprados totalmente a través del sistema de pago propio de Discord - nunca vemos tus datos de pago.",
+    premium_howto_eyebrow: "Cómo conseguir Premium",
+    premium_howto_step: "Ejecuta ,premium en tu servidor, elige un plan y haz clic en el botón de compra - Discord gestiona el pago, y Premium se activa automáticamente en cuanto el pago se procesa.",
+    premium_server_name: "Server Premium",
+    premium_server_blurb: "Aumenta los límites y desbloquea funciones premium para todo tu servidor.",
+    premium_customize_name: "Customize",
+    premium_customize_blurb: "Dale a blaid una identidad personalizada solo para tu servidor.",
+    premium_get_server: "Obtener Server Premium",
+    premium_get_customize: "Obtener Customize",
+  },
+  pt: {
+    docs_cat_start: "PRIMEIROS PASSOS", docs_cat_security: "SEGURANÇA", docs_cat_serverconfig: "CONFIGURAÇÃO DO SERVIDOR",
+    docs_cat_misc: "DIVERSOS", docs_cat_resources: "RECURSOS", docs_cat_reference: "REFERÊNCIA", docs_cat_premium: "PREMIUM",
+    docs_crumb: "Docs", docs_search_ph: "Buscar na documentação...",
+    tix_title: "Criador de tickets", tix_lead: "Crie um painel de tickets completo - opções, formulários, tudo - visualmente, e envie direto para o seu servidor.",
+    tix_login_eyebrow: "Faça login para começar", tix_login_step: "Entre com o Discord para escolher um servidor que você administra e criar um painel de tickets para ele.",
+    tix_login_btn: "Entrar com o Discord",
+    cmds_title: "Comandos", cmds_search_ph: "Buscar comandos...",
+    status_title: "Status", status_checking: "Verificando...", status_servers: "Servidores",
+    status_users: "Usuários", status_latency: "Latência", status_uptime: "Tempo ativo",
+    vars_title: "Variáveis", vars_lead: "Use-as em mensagens de boas-vindas, despedida, boost, tickets e level-up. Marcadores desconhecidos permanecem inalterados.",
+    eb_title: "Criador de embed", eb_lead: "Crie um embed do Discord, veja a pré-visualização exatamente como aparecerá no Discord, e copie o formato de script próprio do blaid em qualquer comando que aceite um script personalizado.",
+    eb_live_preview: "Pré-visualização ao vivo", eb_copy_script: "Copiar script",
+    nav_home: "Início", nav_commands: "Comandos", nav_embed_builder: "Criador de embed",
+    nav_status: "Status", nav_tickets: "Tickets", nav_discord: "Discord",
+    nav_docs: "Documentação", nav_premium: "Premium",
+    footer_support: "Servidor de suporte", footer_privacy: "Privacidade", footer_terms: "Termos",
+    home_title: "blaid é o app tudo-em-um líder do Discord",
+    home_lead: "Conheça o bot líder em gestão e engajamento. Feito para elevar a experiência da sua comunidade, simplificar a gestão do servidor e dar acesso a recursos premium para cada necessidade.",
+    home_invite_btn: "Convidar para o Discord",
+    premium_title: "blaid Premium",
+    premium_lead: "Dois planos independentes, comprados totalmente pelo sistema de pagamento do próprio Discord - nunca vemos seus dados de pagamento.",
+    premium_howto_eyebrow: "Como conseguir o Premium",
+    premium_howto_step: "Execute ,premium no seu servidor, escolha um plano e clique no botão de compra - o Discord cuida do pagamento, e o Premium é ativado automaticamente assim que o pagamento é confirmado.",
+    premium_server_name: "Server Premium",
+    premium_server_blurb: "Aumenta os limites e libera recursos premium para todo o seu servidor.",
+    premium_customize_name: "Customize",
+    premium_customize_blurb: "Dê ao blaid uma identidade personalizada só para o seu servidor.",
+    premium_get_server: "Obter Server Premium",
+    premium_get_customize: "Obter Customize",
+  },
+};
+
+function applyTranslations(lang) {
+  const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.dataset.i18n;
+    if (dict[key]) el.textContent = dict[key];
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const key = el.dataset.i18nPlaceholder;
+    if (dict[key]) el.placeholder = dict[key];
+  });
+}
+
 function initLangSelect() {
   const select = document.querySelector("#lang-select");
   if (!select) return;
 
-  const saved = localStorage.getItem("blaid_lang");
-  if (saved) select.value = saved;
+  const saved = localStorage.getItem("blaid_lang") || "en";
+  select.value = saved;
+  applyTranslations(saved);
 
   select.addEventListener("change", () => {
     localStorage.setItem("blaid_lang", select.value);
+    applyTranslations(select.value);
   });
 }
 
