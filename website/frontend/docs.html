@@ -20,8 +20,11 @@
       <a class="wordmark" href="index.html">blaid.</a>
       <div class="topbar-right">
         <select class="lang-select" id="lang-select">
-          <option value="en">EN</option>
-          <option value="de">DE</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="pt">🇵🇹 Português</option>
         </select>
         <a class="login-chip" id="login-chip" href="#">Login</a>
         <button class="icon-btn" aria-label="Search">
@@ -445,91 +448,173 @@
         <section id="welcome" class="reveal">
           <h2>Welcome</h2>
           <p>
-            Send a message when someone joins - a plain message, or a full custom
-            embed using blaid's <a href="#embeds" style="color: var(--red-bright);">scripting syntax</a>,
-            with variables like <code>{user.mention}</code> and
-            <code>{guild.member_count}</code>.
+            Send a message to a channel automatically whenever someone joins your
+            server - either a plain sentence, or a full custom embed built with
+            blaid's <a href="#embeds" style="color: var(--red-bright);">scripting syntax</a>
+            (title, description, color, image, and buttons).
           </p>
+          <p>
+            Variables like <code>{user.mention}</code>, <code>{guild.name}</code>, and
+            <code>{guild.member_count}</code> get filled in automatically, so the
+            same message works for every new member without editing it each time.
+          </p>
+          <div class="docs-code-block"><code>,welcome channel (channel)
+,welcome message (text or embed script)
+,welcome test
+,welcome disable</code></div>
         </section>
 
         <section id="leave" class="reveal">
           <h2>Leave</h2>
-          <p>The same idea as Welcome, but sent when a member leaves the server.</p>
+          <p>
+            The same idea as Welcome, but triggered when a member leaves the server -
+            same channel/message/test/disable commands, same variable and scripting
+            support. Useful for a simple goodbye message, or just a quiet log of who
+            left and when.
+          </p>
+          <div class="docs-code-block"><code>,leave channel (channel)
+,leave message (text or embed script)
+,leave test
+,leave disable</code></div>
         </section>
 
         <section id="joindm" class="reveal">
           <h2>Join DM</h2>
           <p>
-            DM new members automatically when they join, separate from the in-server
-            welcome message - useful for rules, an invite to a verification form, or
-            just a friendly hello.
+            DMs new members automatically when they join - separate from the
+            in-server Welcome message, and sent privately instead of posted in a
+            channel. Useful for rules, a link to a verification form, or just a
+            personal hello that doesn't clutter a public channel.
           </p>
+          <p>
+            If a member has DMs closed, the send simply fails silently for them -
+            nothing else in the join flow is affected.
+          </p>
+          <div class="docs-code-block"><code>,joindm config
+,joindm message (text or embed script)
+,joindm toggle
+,joindm test</code></div>
         </section>
 
         <section id="boost" class="reveal">
           <h2>Boost</h2>
-          <p>Thank members automatically when they boost the server, with the same scripting and variable support as Welcome.</p>
+          <p>
+            Thank members automatically the moment they boost your server, with the
+            same scripting and variable support as Welcome - mention the booster,
+            show the new boost count, whatever fits your server's tone.
+          </p>
+          <div class="docs-code-block"><code>,boost channel (channel)
+,boost message (text or embed script)
+,boost test</code></div>
         </section>
 
         <section id="automation-messages" class="reveal">
           <h2>Automation &gt; Messages</h2>
           <p>
-            Automated messages sent on a schedule or trigger as part of the
-            automation suite - see <a href="#stickymessages" style="color: var(--red-bright);">Sticky Messages</a>,
+            "Messages" under Automation groups the message-based automation tools
+            together in the sidebar. The actual tools live under their own pages:
+            <a href="#stickymessages" style="color: var(--red-bright);">Sticky Messages</a>,
             <a href="#autoresponder" style="color: var(--red-bright);">Auto Responder</a>, and
-            <a href="#timers" style="color: var(--red-bright);">Timers</a> under the Messages section for the specific tools.
+            <a href="#timers" style="color: var(--red-bright);">Timers</a>.
           </p>
         </section>
 
         <section id="autopfp" class="reveal">
           <h2>AutoPFP</h2>
           <p>
-            Posts a fresh image to a channel on an interval you set - currently
-            sources cat images. (Anime sources were dropped after PebbleHost's shared
-            IP got blocked by every free anime image API - a hosting limitation, not
-            a feature choice.)
+            Posts a fresh image to a channel automatically on whatever interval you
+            set - currently sources cat images from TheCatAPI. (Anime sources were
+            tried and dropped: PebbleHost's shared hosting IP got blocked by every
+            free anime image API tested - a hosting limitation, not a feature
+            choice, and it can come back if hosting ever moves to a dedicated IP.)
           </p>
           <div class="docs-code-block"><code>,autopfp add (channel)
 ,autopfp interval (minutes)
 ,autopfp list
 ,autopfp remove (channel)
 ,autopfp test</code></div>
+          <p>Requires Administrator permission to configure.</p>
         </section>
 
         <section id="scheduledposts" class="reveal">
           <h2>Scheduled Posts</h2>
-          <p>Schedule a message to be sent at a specific time or on a recurring basis, using the same embed scripting as everywhere else.</p>
+          <p>
+            Schedule a message to go out at a specific future time, using the same
+            embed scripting as welcome/leave/boost messages - useful for announcing
+            something ahead of time without needing to be online when it should post.
+          </p>
         </section>
 
         <section id="autoroles" class="reveal">
           <h2>Auto Roles</h2>
-          <p>Automatically gives one or more roles to every new member the moment they join.</p>
+          <p>
+            Automatically gives one or more roles to every new member the moment
+            they join - no manual assignment needed. Useful for a base "Member"
+            role, an unverified/pending role feeding into
+            <a href="#verification" style="color: var(--red-bright);">Verification</a>,
+            or any role everyone should start with.
+          </p>
+          <div class="docs-code-block"><code>,autorole add (role)
+,autorole remove (role)
+,autorole list</code></div>
         </section>
 
         <section id="boosterroles" class="reveal">
           <h2>Booster Roles</h2>
-          <p>Lets boosters create and customize their own personal role - name and color - automatically removed if they stop boosting.</p>
+          <p>
+            Lets anyone currently boosting your server create their own personal
+            role - their own name and color, shown just above the regular member
+            roles. The role is automatically removed the moment they stop boosting,
+            so it never becomes an orphaned permanent role.
+          </p>
+          <div class="docs-code-block"><code>,boosterrole create (name) (color)
+,boosterrole rename (name)
+,boosterrole color (color)
+,boosterrole remove</code></div>
         </section>
 
         <section id="reactionroles" class="reveal">
           <h2>Reaction Roles</h2>
-          <p>React to a message to get a role, remove the reaction to lose it. Set up as many role/emoji pairs per message as you need.</p>
+          <p>
+            React to a specific message with a specific emoji to get a role -
+            remove the reaction and the role comes back off. Set up as many
+            emoji/role pairs on the same message as you need, so one message can
+            offer a whole menu of self-assignable roles.
+          </p>
+          <div class="docs-code-block"><code>,reactionrole add (message) (emoji) (role)
+,reactionrole remove (message) (emoji)
+,reactionrole list</code></div>
         </section>
 
         <section id="buttonroles" class="reveal">
           <h2>Button Roles</h2>
-          <p>The button-based alternative to Reaction Roles - members click a button on a message to toggle a role, no reactions involved.</p>
+          <p>
+            The button-based alternative to Reaction Roles - members click a button
+            under a message to toggle a role on or off, instead of reacting.
+            Functionally the same idea, just a cleaner interface that doesn't
+            clutter the message with emoji reactions.
+          </p>
+          <div class="docs-code-block"><code>,buttonrole add (message) (label) (role)
+,buttonrole remove (message) (label)
+,buttonrole list</code></div>
         </section>
 
         <section id="vanity" class="reveal">
           <h2>Vanity &amp; Server Tag</h2>
           <p>
-            Reward members who put your server's vanity invite (e.g. <code>discord.gg/yourserver</code>)
-            in their custom status, or who equip your server's server tag - awards a
-            role automatically and posts a thank-you.
+            Reward members who help promote your server. Two separate signals:
+            putting your server's vanity invite (e.g. <code>discord.gg/yourserver</code>)
+            somewhere in their custom status, or equipping your server's official
+            server tag on their profile. Either one awards a configured role
+            automatically and posts a thank-you message.
           </p>
-          <div class="docs-code-block"><code>,vanity set (pattern)
-,badge toggle</code></div>
+          <div class="docs-code-block"><code>,vanity channel (channel)
+,vanity set (pattern)
+,vanity role add (role)
+,badge toggle
+,badge channel (channel)
+,badge role add (role)</code></div>
+          <p>Vanity requires the Presence intent to be enabled (already on for blaid), since it reads members' custom status text.</p>
         </section>
 
         <section id="stickymessages" class="reveal">
@@ -542,9 +627,15 @@
           <h2>Auto Responder</h2>
           <p>
             Set a trigger phrase and blaid replies automatically whenever it appears
-            in chat - plain text or a full embed response, with the same scripting
-            system used throughout the bot.
+            anywhere in chat, no command needed from the member - plain text or a
+            full embed response, with the same scripting system used throughout
+            the bot, so a response can mention the trigger's author or link
+            somewhere relevant.
           </p>
+          <div class="docs-code-block"><code>,autoresponder add (trigger) (response or embed script)
+,autoresponder remove (trigger)
+,autoresponder list</code></div>
+          <p>Server Premium raises the number of autoresponders you can have configured at once.</p>
         </section>
 
         <section id="timers" class="reveal">
@@ -603,33 +694,53 @@
 
         <section id="reactiontriggers" class="reveal">
           <h2>Reaction Triggers</h2>
-          <p>Automatically react to messages containing a keyword you configure, without any user input needed.</p>
-          <div class="docs-code-block"><code>,autoreact add
-,autoreact remove
+          <p>
+            Automatically react to any message containing a keyword you configure -
+            no command from members needed, blaid just watches chat and reacts the
+            moment a match appears. Different from Auto Responder: this only adds a
+            reaction, it never sends a message of its own.
+          </p>
+          <div class="docs-code-block"><code>,autoreact add (keyword) (emoji)
+,autoreact remove (keyword)
 ,autoreact list</code></div>
         </section>
 
         <section id="aliases" class="reveal">
           <h2>Command Aliases</h2>
-          <p>Create your own custom shortcut names for any existing blaid command, server-wide.</p>
+          <p>
+            Create your own custom shortcut names for any existing blaid command,
+            server-wide - useful if your team is used to a different word for
+            something, or you want a shorter version of a long command name that
+            everyone in your server can use.
+          </p>
         </section>
 
         <section id="commandpermissions" class="reveal">
           <h2>Command Permissions</h2>
           <p>
             Turn individual commands on or off per server, per channel, or per role
-            with <code>,disable</code>/<code>,enable</code> - and see
-            <a href="#fakepermissions" style="color: var(--red-bright);">Fake Permissions</a>
-            for granting access to a command without the underlying Discord
-            permission.
+            with <code>,disable</code>/<code>,enable</code> - useful for turning off
+            a command entirely in one specific channel, or restricting a risky
+            command to a specific role without changing real Discord permissions.
+          </p>
+          <div class="docs-code-block"><code>,disable (command)
+,disable (command) #channel
+,disable (command) @role
+,enable (command)</code></div>
+          <p>
+            See also <a href="#fakepermissions" style="color: var(--red-bright);">Fake Permissions</a>
+            for the reverse case: granting access to a command without the
+            underlying Discord permission it normally requires.
           </p>
         </section>
 
         <section id="customscripts" class="reveal">
           <h2>Custom Scripts</h2>
           <p>
-            The scripting syntax that powers welcome/leave/boost messages, tickets,
-            and <code>,createembed</code> - see the full breakdown under
+            The scripting syntax that powers welcome/leave/boost/join DM messages,
+            ticket panels, and the standalone <code>,createembed</code> command -
+            one consistent way to build a custom embed or message anywhere blaid
+            supports it. See the full syntax breakdown under
             <a href="#embeds" style="color: var(--red-bright);">Resources &gt; Embeds</a>.
           </p>
         </section>
@@ -643,10 +754,14 @@
         <section id="logging" class="reveal">
           <h2>Logging</h2>
           <p>
-            Sends a log embed to a configured channel for moderation actions and
-            server events, so staff have a running record without watching every
-            channel manually.
+            Sends a log embed to a configured channel automatically for moderation
+            actions and server events - bans, kicks, warns, timeouts, jails,
+            lockdowns, and more - so staff have a running record without needing to
+            watch every channel manually. This is the same logs channel
+            <code>,setup</code> creates for you automatically.
           </p>
+          <div class="docs-code-block"><code>,history [member]</code></div>
+          <p>Shows everything on record for a specific member, pulled from the same log.</p>
         </section>
 
         <section id="tickets" class="reveal">
@@ -697,12 +812,23 @@
 
         <section id="music" class="reveal">
           <h2>Music</h2>
-          <p>Play audio in a voice channel from common sources, with the usual queue, skip, and pause controls.</p>
+          <p>
+            Play audio in a voice channel from common sources - queue up multiple
+            tracks, skip, pause/resume, and adjust volume, with the current queue
+            visible at any time.
+          </p>
         </section>
 
         <section id="giveaways" class="reveal">
           <h2>Giveaways</h2>
-          <p>Run timed giveaways with reaction-based entry, automatic winner selection, and rerolling if a winner doesn't claim.</p>
+          <p>
+            Run timed giveaways with reaction-based entry. blaid picks a winner
+            automatically when the timer ends, and if a winner doesn't claim their
+            prize, you can reroll for a new one without starting over.
+          </p>
+          <div class="docs-code-block"><code>,giveaway start (duration) (prize)
+,giveaway reroll (message)
+,giveaway end (message)</code></div>
         </section>
 
         <section id="counting" class="reveal">
@@ -752,9 +878,15 @@
         <section id="socials" class="reveal">
           <h2>Social Lookups &amp; Feeds</h2>
           <p>
-            Automatic notifications when someone you configure goes live on Twitch or
-            posts a new video on YouTube, posted straight to a channel you choose.
+            Automatic notifications when someone you configure goes live on Twitch
+            or posts a new video on YouTube - posted straight to a channel you
+            choose, with the streamer/creator's name, title, and thumbnail.
           </p>
+          <div class="docs-code-block"><code>,twitch add (channel_name) (discord_channel)
+,twitch remove (channel_name)
+,youtube add (channel_name) (discord_channel)
+,youtube remove (channel_name)</code></div>
+          <p>Twitch alerts are a Server Premium feature.</p>
         </section>
 
         <section id="imageediting" class="reveal">
@@ -773,20 +905,31 @@
         <section id="utility" class="reveal">
           <h2>Utility</h2>
           <p>
-            General-purpose tools: AFK status, AI question answering, translation,
-            reminders, message sniping, emoji management, and more - the everyday
-            commands that don't fit a bigger category.
+            General-purpose tools that don't fit a bigger category. AFK status
+            (<code>,afk</code>, clears automatically the next time you speak),
+            AI question answering (<code>,ai</code>), translation
+            (<code>,translate</code>, auto-detects the source language),
+            reminders (<code>,reminder</code>), message sniping for recently
+            deleted/edited messages (<code>,snipe</code>, <code>,editsnipe</code>),
+            emoji management (<code>,emoji add/remove/steal</code>), and more.
           </p>
         </section>
 
         <section id="information" class="reveal">
           <h2>Information</h2>
           <p>
-            Look-up commands for members, servers, roles, channels, invites, and the
-            bot itself - <code>,userinfo</code>, <code>,serverinfo</code>,
-            <code>,roleinfo</code>, <code>,channelinfo</code>, <code>,botinfo</code>,
-            and more.
+            Look-up commands for members, servers, roles, channels, invites, and
+            the bot itself:
           </p>
+          <div class="docs-code-block"><code>,userinfo [member]
+,serverinfo
+,roleinfo (role)
+,channelinfo [channel]
+,botinfo
+,avatar [member]
+,banner [member]
+,permissions [member]
+,namehistory [member]</code></div>
         </section>
 
         <!-- ==================== RESOURCES ==================== -->
@@ -822,9 +965,14 @@
         <section id="variables" class="reveal">
           <h2>Variables</h2>
           <p>
-            Placeholders like <code>{user.mention}</code> that get replaced with real
-            values wherever scripting is supported - welcome messages, tickets,
-            reaction roles, and more.
+            Placeholders like <code>{user.mention}</code> that get replaced with
+            real values wherever scripting is supported - welcome/leave/boost/join
+            DM messages, ticket panels, reaction roles, and <code>,createembed</code>.
+          </p>
+          <p>
+            Grouped by category: Guild, User, Channel, Ticket, Twitch, YouTube,
+            Leveling, and more - each with the exact placeholder text and an example
+            of what it resolves to.
           </p>
           <p>See the full, categorized list on the <a href="variables.html" style="color: var(--red-bright);">Variables</a> reference page.</p>
         </section>
