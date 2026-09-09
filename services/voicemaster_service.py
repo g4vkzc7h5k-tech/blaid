@@ -17,13 +17,13 @@ from repositories import voicemaster_repository
 from core.variables import resolve_variables
 
 ICONS = {
-    "lock": "<:emoji_5:1543849590510587966>",
-    "unlock": "<:emoji_6:1543849619241304164>",
-    "hide": "<:emoji_11:1543849750871146586>",
-    "rename": "<:emoji_13:1543853047866982430>",
-    "claim": "<:emoji_10:1543849724170215425>",
-    "limit": "<:emoji_9:1543849701689004073>",
-    "delete": "<:emoji_8:1543849676791611462>",
+    "lock": "<:https_100dp_E3E3E3:1544134598915522772>",
+    "unlock": "<:no_encryption_100dp_E3E3E3:1544137164567089243>",
+    "hide": "<:visibility_off_100dp_E3E3E3:1544133061422092409>",
+    "rename": "<:edit_100dp_E3E3E3:1544136620259676190>",
+    "claim": "<:login_100dp_E3E3E3:1544138442844278857>",
+    "limit": "<:people_alt_100dp_E3E3E3:1544138018682568874>",
+    "delete": "<:delete_100dp_E3E3E3:1544132997677060106>",
 }
 
 
@@ -463,22 +463,22 @@ class InterfaceView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(emoji="<:emoji_11:1541277626369446009>", style=discord.ButtonStyle.secondary, custom_id="blade_vm_lock")
+    @discord.ui.button(emoji=ICONS["lock"], style=discord.ButtonStyle.secondary, custom_id="blade_vm_lock")
     async def lock_button(self, interaction: discord.Interaction, _button: discord.ui.Button):
         success, message = await lock(interaction.guild, interaction.user)
         await interaction.response.send_message(embed=discord.Embed(description=message), ephemeral=True)
 
-    @discord.ui.button(emoji="<:emoji_10:1541277608354783403>", style=discord.ButtonStyle.secondary, custom_id="blade_vm_unlock")
+    @discord.ui.button(emoji=ICONS["unlock"], style=discord.ButtonStyle.secondary, custom_id="blade_vm_unlock")
     async def unlock_button(self, interaction: discord.Interaction, _button: discord.ui.Button):
         success, message = await unlock(interaction.guild, interaction.user)
         await interaction.response.send_message(embed=discord.Embed(description=message), ephemeral=True)
 
-    @discord.ui.button(emoji="<:emoji_4:1541277464838283354>", style=discord.ButtonStyle.secondary, custom_id="blade_vm_hide")
+    @discord.ui.button(emoji=ICONS["hide"], style=discord.ButtonStyle.secondary, custom_id="blade_vm_hide")
     async def hide_button(self, interaction: discord.Interaction, _button: discord.ui.Button):
         success, message = await hide(interaction.guild, interaction.user)
         await interaction.response.send_message(embed=discord.Embed(description=message), ephemeral=True)
 
-    @discord.ui.button(emoji="<:emoji_8:1541277569620508702>", style=discord.ButtonStyle.secondary, custom_id="blade_vm_rename")
+    @discord.ui.button(emoji=ICONS["rename"], style=discord.ButtonStyle.secondary, custom_id="blade_vm_rename")
     async def rename_button(self, interaction: discord.Interaction, _button: discord.ui.Button):
         channel, temp, error = await _get_owned(interaction.guild, interaction.user)
         if error:
@@ -486,12 +486,12 @@ class InterfaceView(discord.ui.View):
             return
         await interaction.response.send_modal(RenameModal())
 
-    @discord.ui.button(emoji="<:emoji_5:1541277485164003338>", style=discord.ButtonStyle.secondary, custom_id="blade_vm_claim")
+    @discord.ui.button(emoji=ICONS["claim"], style=discord.ButtonStyle.secondary, custom_id="blade_vm_claim")
     async def claim_button(self, interaction: discord.Interaction, _button: discord.ui.Button):
         success, message = await claim(interaction.guild, interaction.user)
         await interaction.response.send_message(embed=discord.Embed(description=message), ephemeral=True)
 
-    @discord.ui.button(emoji="<:emoji_6:1541277509210079293>", style=discord.ButtonStyle.secondary, custom_id="blade_vm_limit")
+    @discord.ui.button(emoji=ICONS["limit"], style=discord.ButtonStyle.secondary, custom_id="blade_vm_limit")
     async def limit_button(self, interaction: discord.Interaction, _button: discord.ui.Button):
         channel, temp, error = await _get_owned(interaction.guild, interaction.user)
         if error:
@@ -499,7 +499,7 @@ class InterfaceView(discord.ui.View):
             return
         await interaction.response.send_modal(LimitModal())
 
-    @discord.ui.button(emoji="<:emoji_7:1541277526478037083>", style=discord.ButtonStyle.danger, custom_id="blade_vm_delete")
+    @discord.ui.button(emoji=ICONS["delete"], style=discord.ButtonStyle.danger, custom_id="blade_vm_delete")
     async def delete_button(self, interaction: discord.Interaction, _button: discord.ui.Button):
         success, message = await delete_channel(interaction.guild, interaction.user)
         await interaction.response.send_message(embed=discord.Embed(description=message), ephemeral=True)
