@@ -19,6 +19,11 @@
       </button>
       <a class="wordmark" href="index.html">blaid.</a>
       <div class="topbar-right">
+        <select class="lang-select" id="lang-select">
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
+        <a class="login-chip" id="login-chip" href="#">Login</a>
         <button class="icon-btn" aria-label="Search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </button>
@@ -42,30 +47,103 @@
 
     <div class="docs-shell">
       <aside class="docs-sidebar">
+        <div class="docs-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="docs-search-input" placeholder="Search docs...">
+        </div>
+
         <div class="docs-nav-group">
           <p class="docs-nav-label">GETTING STARTED</p>
           <a href="#introduction" class="active">Introduction</a>
           <a href="#setup">Server Setup</a>
-          <a href="#permissions">Permissions</a>
           <a href="#prefixes">Prefixes</a>
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">FEATURES</p>
+          <p class="docs-nav-label">SECURITY</p>
+          <a href="#antinuke">Antinuke</a>
+          <a href="#antiraid">Antiraid</a>
+          <a href="#automod">Automod</a>
           <a href="#moderation">Moderation</a>
-          <a href="#antinuke">Antinuke &amp; Antiraid</a>
-          <a href="#tickets">Tickets</a>
-          <a href="#levels">Leveling</a>
+          <a href="#fakepermissions">Fake Permissions</a>
+          <a href="#honeypot">Honeypot</a>
+          <a href="#verification">Verification &amp; Recovery</a>
+        </div>
+
+        <div class="docs-nav-group">
+          <p class="docs-nav-label">SERVER CONFIGURATION</p>
+
+          <button class="docs-nav-expand" data-target="sub-automation">Automation</button>
+          <div class="docs-nav-sub" id="sub-automation">
+            <a href="#welcome">Welcome</a>
+            <a href="#leave">Leave</a>
+            <a href="#joindm">Join DM</a>
+            <a href="#boost">Boost</a>
+            <a href="#automation-messages">Messages</a>
+            <a href="#autopfp">AutoPFP</a>
+            <a href="#scheduledposts">Scheduled Posts</a>
+          </div>
+
+          <button class="docs-nav-expand" data-target="sub-roles">Roles</button>
+          <div class="docs-nav-sub" id="sub-roles">
+            <a href="#autoroles">Auto Roles</a>
+            <a href="#boosterroles">Booster Roles</a>
+            <a href="#reactionroles">Reaction Roles</a>
+            <a href="#buttonroles">Button Roles</a>
+            <a href="#vanity">Vanity &amp; Server Tag</a>
+          </div>
+
+          <button class="docs-nav-expand" data-target="sub-messages">Messages</button>
+          <div class="docs-nav-sub" id="sub-messages">
+            <a href="#stickymessages">Sticky Messages</a>
+            <a href="#autoresponder">Auto Responder</a>
+            <a href="#timers">Timers</a>
+          </div>
+
           <a href="#voicemaster">VoiceMaster</a>
-          <a href="#lastfm">Last.fm</a>
+          <a href="#levels">Levels</a>
+          <a href="#retention">Retention</a>
+          <a href="#bumpreminder">Bump Reminder</a>
+          <a href="#reactiontriggers">Reaction Triggers</a>
+          <a href="#aliases">Command Aliases</a>
+          <a href="#commandpermissions">Command Permissions</a>
+          <a href="#customscripts">Custom Scripts</a>
+          <a href="#usernametracking">Username Tracking</a>
+          <a href="#logging">Logging</a>
+          <a href="#tickets">Tickets</a>
+          <a href="#confessions">Confessions</a>
+          <a href="#backups">Backups</a>
+          <a href="#discovery">Discovery</a>
+        </div>
+
+        <div class="docs-nav-group">
+          <p class="docs-nav-label">MISCELLANEOUS</p>
+          <a href="#music">Music</a>
           <a href="#giveaways">Giveaways</a>
-          <a href="#automation">Automation</a>
+          <a href="#counting">Counting</a>
+          <a href="#lastfm">Last.fm</a>
+          <a href="#economy">Economy</a>
+          <a href="#fun">Fun</a>
+          <a href="#socials">Social Lookups &amp; Feeds</a>
+          <a href="#imageediting">Image Editing</a>
+          <a href="#utility">Utility</a>
+          <a href="#information">Information</a>
+        </div>
+
+        <div class="docs-nav-group">
+          <p class="docs-nav-label">RESOURCES</p>
+          <button class="docs-nav-expand" data-target="sub-scripting">Scripting</button>
+          <div class="docs-nav-sub" id="sub-scripting">
+            <a href="#embeds">Embeds</a>
+            <a href="#variables">Variables</a>
+          </div>
+          <a href="#permissionslist">Permissions</a>
         </div>
 
         <div class="docs-nav-group">
           <p class="docs-nav-label">REFERENCE</p>
           <a href="commands.html">Commands</a>
-          <a href="variables.html">Variables</a>
+          <a href="variables.html">Variables Reference</a>
         </div>
 
         <div class="docs-nav-group">
@@ -75,14 +153,15 @@
       </aside>
 
       <main class="docs-content">
+
         <section id="introduction" class="reveal">
           <h1>Introduction</h1>
           <p class="docs-sub">Everything you need to get blaid running well in your server.</p>
           <p>
             blaid is an all-in-one Discord app: moderation and security, leveling,
-            tickets, VoiceMaster, giveaways, Last.fm, and a growing set of automation
-            tools, all in one bot. It's built to replace several single-purpose bots
-            with one consistent, well-documented one.
+            tickets, VoiceMaster, giveaways, Last.fm, economy, image editing, and a
+            growing set of automation tools, all in one bot. It's built to replace
+            several single-purpose bots with one consistent, well-documented one.
           </p>
           <p>
             Every command on this site is pulled directly from the bot's own code, so
@@ -122,28 +201,6 @@
           </p>
         </section>
 
-        <section id="permissions" class="reveal">
-          <h2>Permissions</h2>
-          <p>
-            Most commands check for a real Discord permission (Manage Guild, Ban
-            Members, Manage Roles, and so on) before running - whichever permission
-            a command needs is shown on its card on the Commands page.
-          </p>
-          <p>
-            Sometimes you want a role to be able to use a specific blaid command
-            without handing out the real, powerful Discord permission that command
-            normally requires - a moderator role that can use <code>,ban</code>
-            without actually having server-wide Ban Members, for example.
-            <code>,fakepermissions</code> lets you grant that on a per-role,
-            per-permission basis, just for blaid.
-          </p>
-          <p>
-            You can also disable individual commands per server with <code>,disable</code>
-            - server-wide, or scoped to a specific channel or role - and bring them
-            back with <code>,enable</code>.
-          </p>
-        </section>
-
         <section id="prefixes" class="reveal">
           <h2>Prefixes</h2>
           <p>
@@ -151,6 +208,99 @@
             server-wide prefix, and any member can additionally set their own
             personal prefix that works for them specifically in every server blaid
             is in - handy if the server prefix clashes with another bot you use.
+          </p>
+        </section>
+
+        <!-- ==================== SECURITY ==================== -->
+
+        <section id="antinuke" class="reveal">
+          <h2>Antinuke</h2>
+          <p>Set restrictions on your staff to prevent harm from being done on your server.</p>
+
+          <h3>What is antinuke?</h3>
+          <p>
+            Antinuke automatically limits how many destructive actions your staff can
+            take. If a staff member exceeds a threshold, they're punished automatically
+            and your server stays safe from a compromised or malicious admin account.
+          </p>
+          <p>
+            The server owner and whitelisted users are always exempt. Antinuke tracks
+            actions in a rolling window per user, per action type - each staff member
+            has their own counter for bans, kicks, and so on. Antinuke has to be turned
+            on explicitly, and each module is configured separately.
+          </p>
+          <p>
+            Available punishments: ban, kick, timeout, strip (removes only dangerous
+            roles), staffstrip (removes only staff roles), and jail. Antinuke never
+            deletes messages - it only blocks the action and punishes whoever tried it.
+          </p>
+
+          <h3>Antinuke admins</h3>
+          <p>
+            By default, only the server owner can change the antinuke configuration.
+            You can add other trusted staff as antinuke admins so they can manage it
+            too.
+          </p>
+          <div class="docs-code-block"><code>,antinuke admin (@user)</code></div>
+          <p>This is a sensitive command - it lets that user fully reconfigure antinuke. Run the same command again to remove someone as an admin.</p>
+          <div class="docs-code-block"><code>,antinuke admins</code></div>
+          <p>Lists every current antinuke admin.</p>
+
+          <h3>Whitelisting</h3>
+          <p>Everyone is subject to antinuke by default. Whitelist a user to exempt them entirely.</p>
+          <div class="docs-code-block"><code>,antinuke whitelist (user)</code></div>
+          <p>Run the same command again to remove them from the whitelist.</p>
+          <div class="docs-code-block"><code>,antinuke list</code></div>
+          <p>Shows everyone currently whitelisted.</p>
+
+          <h3>Configuring antinuke</h3>
+          <p>Use <code>,antinuke</code> at any time to see the current settings. Turn it on first:</p>
+          <div class="docs-code-block"><code>,antinuke enable</code></div>
+          <p>Then configure each module you want protected, and set its punishment and threshold. A higher threshold means someone has to do more of that action before it triggers.</p>
+          <div class="docs-code-block"><code>,antinuke (module) (status) (punishment)
+,antinuke (module) threshold (threshold)</code></div>
+          <p>Check any module's current settings with <code>,antinuke (module)</code>.</p>
+        </section>
+
+        <section id="antiraid" class="reveal">
+          <h2>Antiraid</h2>
+          <p>Automatically detect potential raids and ongoing raids.</p>
+
+          <h3>Configuring antiraid</h3>
+          <p>
+            Turn it on with <code>,antiraid toggle on</code>. Unlike antinuke, anyone
+            with the Administrator permission can configure antiraid, not just the
+            owner or antinuke admins. The server owner and whitelisted users are
+            always exempt from enforcement.
+          </p>
+
+          <h3>Modules</h3>
+          <p>Antiraid watches join events across several modules, each with its own threshold and action: Mass Join, New Accounts, Avatar, Username, Mass Mention, and Unverified Bots.</p>
+          <div class="docs-code-block"><code>,antiraid (module) [status]
+,antiraid (module) threshold (value)
+,antiraid (module) (status) (action)</code></div>
+
+          <h3>Lockdown state</h3>
+          <p>If your server is actively being raided, you can manually flip on lockdown to restrict access immediately, without waiting for a module to trigger.</p>
+          <div class="docs-code-block"><code>,antiraid state</code></div>
+
+          <h3>Whitelisting</h3>
+          <p>Exempt specific users or roles from antiraid entirely.</p>
+          <div class="docs-code-block"><code>,antiraid whitelist [user]</code></div>
+          <p>Run the same command again to remove them.</p>
+        </section>
+
+        <section id="automod" class="reveal">
+          <h2>Automod</h2>
+          <p>Automatic message and word filtering, so your team isn't watching chat 24/7.</p>
+          <p>
+            Add words or phrases to the filter and blaid removes matching messages on
+            sight, no moderator needed.
+          </p>
+          <div class="docs-code-block"><code>,filter add (word)</code></div>
+          <p>
+            Run this during <code>,setup</code>'s quick-start flow to get moderation
+            started automatically from day one.
           </p>
         </section>
 
@@ -167,94 +317,557 @@
           <p>
             Every action - who did what, to whom, and why - is written to your
             configured logs channel automatically, with a running case number so
-            nothing gets lost.
+            nothing gets lost. Run <code>,history [member]</code> to see everything
+            on record for someone.
+          </p>
+          <p>
+            <code>,purge</code> covers bulk deletion with over 20 filters (bots,
+            humans, embeds, links, invites, images, and more), and
+            <code>,lockdown</code>/<code>,unlock</code> handle locking channels down
+            during an incident.
+          </p>
+          <p>
+            Want a message customized differently than the default when someone gets
+            punished? <code>,invoke</code> lets you set your own DM or channel message
+            per command, with variables like <code>{user.mention}</code> and
+            <code>{custom.reason}</code>.
           </p>
         </section>
 
-        <section id="antinuke" class="reveal">
-          <h2>Antinuke &amp; Antiraid</h2>
+        <section id="fakepermissions" class="reveal">
+          <h2>Fake Permissions</h2>
+          <p>Grant virtual permissions to roles to allow usage of specific blaid commands.</p>
+
+          <h3>What are Fake Permissions?</h3>
           <p>
-            Antinuke watches for the exact patterns a compromised admin account or a
-            malicious bot uses to destroy a server fast - mass channel deletion, mass
-            banning, webhook abuse, dangerous permission grants - and can strip roles,
-            kick, or ban the account responsible before real damage is done, all with
-            thresholds you control.
+            Fake permissions let you grant "virtual" permissions to a role - members
+            with that role can use blaid commands that normally require a specific
+            Discord permission (like Manage Guild or Kick Members), without actually
+            having that permission on Discord itself.
           </p>
           <p>
-            Antiraid is the join-side counterpart: it looks at mass joins, brand new
-            accounts, default avatars, and suspicious username patterns to catch a
-            coordinated raid as it's happening, not after.
+            This only affects blaid's own command checks - it doesn't grant real
+            Discord permissions and has no effect on any other bot. Be careful:
+            granting something like <code>ban_members</code> or <code>kick_members</code>
+            lets that role use those commands entirely outside Discord's own
+            permission oversight. Fake permissions persist across restarts.
+          </p>
+
+          <h3>Adding and removing</h3>
+          <div class="docs-code-block"><code>,fakepermissions add (role) (permissions)</code></div>
+          <p>Add multiple permissions at once by separating them with commas.</p>
+          <div class="docs-code-block"><code>,fakepermissions remove (role)</code></div>
+
+          <h3>Managing configurations</h3>
+          <div class="docs-code-block"><code>,fakepermissions list</code></div>
+          <p>View every role and its fake permissions.</p>
+          <div class="docs-code-block"><code>,fakepermissions reset</code></div>
+          <p>Removes every fake permission in the server at once.</p>
+        </section>
+
+        <section id="honeypot" class="reveal">
+          <h2>Honeypot</h2>
+          <p>Automatically punish users who post in a honeypot trap channel.</p>
+
+          <h3>Overview</h3>
+          <p>
+            A honeypot is a decoy channel that catches anyone who posts in it -
+            designed to snag compromised accounts, selfbots, and spam bots that
+            ignore channel permissions. blaid can ban, kick, or softban the offender,
+            and optionally purge their recent messages.
+          </p>
+
+          <h3>Getting started</h3>
+          <div class="docs-code-block"><code>,honeypot setup</code></div>
+          <p>
+            Creates a channel named "honeypot" and arms it. blaid needs Manage
+            Channels, Ban Members, Kick Members, and Manage Messages to work. The
+            channel has no permission overwrites by default - hide it from regular
+            members yourself using Discord's own permission system, so only someone
+            who shouldn't see it (a compromised account, a raid bot) would ever post
+            there.
+          </p>
+
+          <h3>Configuration</h3>
+          <div class="docs-code-block"><code>,honeypot config
+,honeypot action (ban|kick|softban)
+,honeypot history (days)
+,honeypot logs (channel)
+,honeypot disable
+,honeypot remove</code></div>
+
+          <h3>Troubleshooting</h3>
+          <p>
+            Honeypots only trigger on an actual message - someone who can see the
+            channel but never posts won't trip it. blaid's role also has to sit above
+            the offender's highest role to actually punish them; if it can't, the
+            action silently fails but the attempt is still logged.
+          </p>
+        </section>
+
+        <section id="verification" class="reveal">
+          <h2>Verification &amp; Recovery</h2>
+          <p>Hold risky new accounts for review, and put a server back together after a raid.</p>
+
+          <h3>The verification gate</h3>
+          <p>
+            New members can be held in a quarantine role until a moderator reviews
+            them - rather than being let in immediately or kicked automatically.
+          </p>
+          <div class="docs-code-block"><code>,verification setup (channel) [threshold]
+,verification off</code></div>
+          <p>
+            <code>,verification setup</code> creates the quarantine role for you and
+            locks it out of every existing channel except the review channel you
+            give it. Accounts younger than the threshold (in days) get the role and
+            are posted in that channel for a moderator to <code>,verification approve</code>
+            or <code>,verification deny</code>.
+          </p>
+          <p>
+            Channels created after setup aren't covered automatically - deny the
+            quarantine role View Channel on new channels, or run
+            <code>,verification setup</code> again to re-lock everything.
+          </p>
+
+          <h3>Raid recovery</h3>
+          <p class="docs-coming-soon">Coming soon - not yet available in blaid.</p>
+          <p>
+            The plan: automatic periodic backups and a <code>,recover</code> command
+            that rebuilds missing channels and roles after a raid, merge-only so it
+            never deletes or overwrites anything that survived. Until then,
+            <a href="#backups" style="color: var(--red-bright);">,backup create</a> and
+            <code>,backup restore</code> cover manual backup and restore today.
+          </p>
+        </section>
+
+        <!-- ==================== SERVER CONFIGURATION ==================== -->
+
+        <section id="welcome" class="reveal">
+          <h2>Welcome</h2>
+          <p>
+            Send a message when someone joins - a plain message, or a full custom
+            embed using blaid's <a href="#embeds" style="color: var(--red-bright);">scripting syntax</a>,
+            with variables like <code>{user.mention}</code> and
+            <code>{guild.member_count}</code>.
+          </p>
+        </section>
+
+        <section id="leave" class="reveal">
+          <h2>Leave</h2>
+          <p>The same idea as Welcome, but sent when a member leaves the server.</p>
+        </section>
+
+        <section id="joindm" class="reveal">
+          <h2>Join DM</h2>
+          <p>
+            DM new members automatically when they join, separate from the in-server
+            welcome message - useful for rules, an invite to a verification form, or
+            just a friendly hello.
+          </p>
+        </section>
+
+        <section id="boost" class="reveal">
+          <h2>Boost</h2>
+          <p>Thank members automatically when they boost the server, with the same scripting and variable support as Welcome.</p>
+        </section>
+
+        <section id="automation-messages" class="reveal">
+          <h2>Automation &gt; Messages</h2>
+          <p>
+            Automated messages sent on a schedule or trigger as part of the
+            automation suite - see <a href="#stickymessages" style="color: var(--red-bright);">Sticky Messages</a>,
+            <a href="#autoresponder" style="color: var(--red-bright);">Auto Responder</a>, and
+            <a href="#timers" style="color: var(--red-bright);">Timers</a> under the Messages section for the specific tools.
+          </p>
+        </section>
+
+        <section id="autopfp" class="reveal">
+          <h2>AutoPFP</h2>
+          <p>
+            Posts a fresh image to a channel on an interval you set - currently
+            sources cat images. (Anime sources were dropped after PebbleHost's shared
+            IP got blocked by every free anime image API - a hosting limitation, not
+            a feature choice.)
+          </p>
+          <div class="docs-code-block"><code>,autopfp add (channel)
+,autopfp interval (minutes)
+,autopfp list
+,autopfp remove (channel)
+,autopfp test</code></div>
+        </section>
+
+        <section id="scheduledposts" class="reveal">
+          <h2>Scheduled Posts</h2>
+          <p>Schedule a message to be sent at a specific time or on a recurring basis, using the same embed scripting as everywhere else.</p>
+        </section>
+
+        <section id="autoroles" class="reveal">
+          <h2>Auto Roles</h2>
+          <p>Automatically gives one or more roles to every new member the moment they join.</p>
+        </section>
+
+        <section id="boosterroles" class="reveal">
+          <h2>Booster Roles</h2>
+          <p>Lets boosters create and customize their own personal role - name and color - automatically removed if they stop boosting.</p>
+        </section>
+
+        <section id="reactionroles" class="reveal">
+          <h2>Reaction Roles</h2>
+          <p>React to a message to get a role, remove the reaction to lose it. Set up as many role/emoji pairs per message as you need.</p>
+        </section>
+
+        <section id="buttonroles" class="reveal">
+          <h2>Button Roles</h2>
+          <p>The button-based alternative to Reaction Roles - members click a button on a message to toggle a role, no reactions involved.</p>
+        </section>
+
+        <section id="vanity" class="reveal">
+          <h2>Vanity &amp; Server Tag</h2>
+          <p>
+            Reward members who put your server's vanity invite (e.g. <code>discord.gg/yourserver</code>)
+            in their custom status, or who equip your server's server tag - awards a
+            role automatically and posts a thank-you.
+          </p>
+          <div class="docs-code-block"><code>,vanity set (pattern)
+,badge toggle</code></div>
+        </section>
+
+        <section id="stickymessages" class="reveal">
+          <h2>Sticky Messages</h2>
+          <p class="docs-coming-soon">Coming soon - not yet available in blaid.</p>
+          <p>A message that stays pinned to the bottom of a channel, automatically re-posting itself after new messages push it up - useful for rules or an FAQ that should always be visible.</p>
+        </section>
+
+        <section id="autoresponder" class="reveal">
+          <h2>Auto Responder</h2>
+          <p>
+            Set a trigger phrase and blaid replies automatically whenever it appears
+            in chat - plain text or a full embed response, with the same scripting
+            system used throughout the bot.
+          </p>
+        </section>
+
+        <section id="timers" class="reveal">
+          <h2>Timers</h2>
+          <p>
+            Personal reminders that DM or ping you back after a set duration.
+          </p>
+          <div class="docs-code-block"><code>,reminder (duration) [description]
+,reminder list
+,reminder remove (index)</code></div>
+        </section>
+
+        <section id="voicemaster" class="reveal">
+          <h2>VoiceMaster</h2>
+          <p>
+            Join-to-create voice channels: members join a designated channel and
+            blaid instantly makes them their own temporary voice channel, which they
+            fully control.
+          </p>
+          <div class="docs-code-block"><code>,voicemaster setup</code></div>
+          <p>
+            Sets up the category, the "Join To Create" channel, and an interface
+            channel with buttons for Lock, Unlock, Hide, Rename, Claim, Limit, and
+            Delete. Renaming the Join To Create channel afterward is safe - blaid
+            tracks it by ID, not by name.
+          </p>
+        </section>
+
+        <section id="levels" class="reveal">
+          <h2>Levels</h2>
+          <p>
+            Members earn XP from chatting and level up over time, with configurable
+            role rewards at specific levels and a fully custom level-up card image.
+          </p>
+          <div class="docs-code-block"><code>,rank [member]
+,leaderboard</code></div>
+        </section>
+
+        <section id="retention" class="reveal">
+          <h2>Retention</h2>
+          <p>
+            See how many new members actually stick around: how many spoke at least
+            once after joining, and how many are still in the server.
+          </p>
+          <div class="docs-code-block"><code>,funnel [days]</code></div>
+        </section>
+
+        <section id="bumpreminder" class="reveal">
+          <h2>Bump Reminder</h2>
+          <p>Automatically thanks whoever bumps your server on Disboard, then reminds the server when it's time to bump again - tracks Disboard's real 2-hour cooldown, plus a leaderboard of who's bumped the most.</p>
+          <div class="docs-code-block"><code>,bumpreminder enable [channel]
+,bumpreminder thankyou [message]
+,bumpreminder reminder [message]
+,bumpreminder leaderboard</code></div>
+        </section>
+
+        <section id="reactiontriggers" class="reveal">
+          <h2>Reaction Triggers</h2>
+          <p>Automatically react to messages containing a keyword you configure, without any user input needed.</p>
+          <div class="docs-code-block"><code>,autoreact add
+,autoreact remove
+,autoreact list</code></div>
+        </section>
+
+        <section id="aliases" class="reveal">
+          <h2>Command Aliases</h2>
+          <p>Create your own custom shortcut names for any existing blaid command, server-wide.</p>
+        </section>
+
+        <section id="commandpermissions" class="reveal">
+          <h2>Command Permissions</h2>
+          <p>
+            Turn individual commands on or off per server, per channel, or per role
+            with <code>,disable</code>/<code>,enable</code> - and see
+            <a href="#fakepermissions" style="color: var(--red-bright);">Fake Permissions</a>
+            for granting access to a command without the underlying Discord
+            permission.
+          </p>
+        </section>
+
+        <section id="customscripts" class="reveal">
+          <h2>Custom Scripts</h2>
+          <p>
+            The scripting syntax that powers welcome/leave/boost messages, tickets,
+            and <code>,createembed</code> - see the full breakdown under
+            <a href="#embeds" style="color: var(--red-bright);">Resources &gt; Embeds</a>.
+          </p>
+        </section>
+
+        <section id="usernametracking" class="reveal">
+          <h2>Username Tracking</h2>
+          <p>blaid keeps a history of every name change it sees for a member, so staff can look back at previous usernames.</p>
+          <div class="docs-code-block"><code>,namehistory [member]</code></div>
+        </section>
+
+        <section id="logging" class="reveal">
+          <h2>Logging</h2>
+          <p>
+            Sends a log embed to a configured channel for moderation actions and
+            server events, so staff have a running record without watching every
+            channel manually.
           </p>
         </section>
 
         <section id="tickets" class="reveal">
           <h2>Tickets</h2>
           <p>
-            Set up a ticket panel with <code>,tickets panel</code>, customize the
-            questions members answer when opening one, and route different ticket
-            types to different categories. Staff claim, close, reopen, and delete
-            tickets right from buttons on the channel itself, and every closed
-            ticket can generate a transcript automatically.
+            Fully configurable support ticket panels - single-button or dropdown
+            with multiple ticket types, each with its own category, support roles,
+            claim/close behavior, custom form questions, and automated messages.
+          </p>
+          <p>
+            Build a panel visually at <a href="tickets.html" style="color: var(--red-bright);">blaid.best/tickets</a> -
+            log in with Discord, pick your server, and design Panel, Forms, and
+            Options separately with a live preview, no commands needed.
           </p>
         </section>
 
-        <section id="levels" class="reveal">
-          <h2>Leveling</h2>
+        <section id="confessions" class="reveal">
+          <h2>Confessions</h2>
+          <p class="docs-coming-soon">Coming soon - not yet available in blaid.</p>
+          <p>Anonymous confession submissions posted to a designated channel, with the submitter's identity never revealed.</p>
+        </section>
+
+        <section id="backups" class="reveal">
+          <h2>Backups</h2>
+          <p>Snapshot your server's roles, categories, channels, and settings, and restore from one later.</p>
+          <div class="docs-code-block"><code>,backup create
+,backup list
+,backup view (name)
+,backup restore (name)</code></div>
           <p>
-            Members earn XP from chatting and level up over time. Configure the
-            level-up message, assign role rewards at specific levels, and - with
-            Server Premium - customize the level-up card's look for your server.
+            Restore supports two modes: merge (only adds back what's missing,
+            leaves everything else alone) or destructive (wipes the server back to
+            exactly the backup state, with a confirmation step first).
           </p>
         </section>
 
-        <section id="voicemaster" class="reveal">
-          <h2>VoiceMaster</h2>
+        <section id="discovery" class="reveal">
+          <h2>Discovery</h2>
           <p>
-            Join-to-create voice channels: members joining your hub channel get
-            their own temporary voice channel they fully control - lock it, rename
-            it, set a user limit, or hand ownership to someone else - all through
-            buttons on a control panel, no commands to memorize.
+            How people find blaid: our own <a href="index.html" style="color: var(--red-bright);">website</a>,
+            Discord's built-in App Directory, and third-party bot listing sites.
+            This isn't a server-configurable feature - just where to look if you want
+            to see blaid's public listing or leave a review.
           </p>
+        </section>
+
+        <!-- ==================== MISCELLANEOUS ==================== -->
+
+        <section id="music" class="reveal">
+          <h2>Music</h2>
+          <p>Play audio in a voice channel from common sources, with the usual queue, skip, and pause controls.</p>
+        </section>
+
+        <section id="giveaways" class="reveal">
+          <h2>Giveaways</h2>
+          <p>Run timed giveaways with reaction-based entry, automatic winner selection, and rerolling if a winner doesn't claim.</p>
+        </section>
+
+        <section id="counting" class="reveal">
+          <h2>Counting</h2>
+          <p class="docs-coming-soon">Coming soon - not yet available in blaid.</p>
+          <p>A dedicated channel where members count upward together, one number per message, with the bot tracking mistakes and the current streak.</p>
         </section>
 
         <section id="lastfm" class="reveal">
           <h2>Last.fm</h2>
           <p>
-            Link a Last.fm account with <code>,lastfm set</code>, then check what
-            you're currently playing with <code>,fm</code>, browse your top artists,
-            albums, and tracks, compare taste with friends, and see who in the
-            server has played a given artist the most.
+            A full Last.fm integration: what you're currently listening to, top
+            tracks/albums/artists, collages, "whoknows" server leaderboards for a
+            given artist, crowns, taste comparisons with other members, and a full
+            recap of your year.
+          </p>
+          <div class="docs-code-block"><code>,fm
+,lastfm whoknows (artist)
+,lastfm collage
+,lastfm recap</code></div>
+        </section>
+
+        <section id="economy" class="reveal">
+          <h2>Economy</h2>
+          <p>
+            A full server economy: wallet and bank balances, <code>,daily</code>,
+            <code>,work</code>, <code>,crime</code>, and <code>,rob</code> for
+            earning (and losing) money, a server <code>,shop</code>, and 12 games
+            including blackjack, crash, slots, roulette, and dice.
+          </p>
+          <div class="docs-code-block"><code>,balance [member]
+,daily
+,leaderboard</code></div>
+        </section>
+
+        <section id="fun" class="reveal">
+          <h2>Fun</h2>
+          <p>
+            Games and lighthearted commands: Tic-Tac-Toe and BlackTea (a
+            word-and-letters party game with lives and a countdown), plus a set of
+            "how much/how many" novelty commands.
+          </p>
+          <div class="docs-code-block"><code>,tictactoe (opponent)
+,blacktea</code></div>
+        </section>
+
+        <section id="socials" class="reveal">
+          <h2>Social Lookups &amp; Feeds</h2>
+          <p>
+            Automatic notifications when someone you configure goes live on Twitch or
+            posts a new video on YouTube, posted straight to a channel you choose.
           </p>
         </section>
 
-        <section id="giveaways" class="reveal">
-          <h2>Giveaways</h2>
+        <section id="imageediting" class="reveal">
+          <h2>Image Editing</h2>
           <p>
-            Start a giveaway with a duration, a winner count, and an optional role
-            requirement to enter. blaid picks winners automatically when it ends,
-            and you can reroll a winner at any time if needed.
+            Dozens of avatar manipulation effects, all pure code (no image assets
+            needed) - blur, glitch, gameboy palette, invert, pixelate, dizzy swirl,
+            neon edges, and many more. Run any of them on yourself or another member.
+          </p>
+          <div class="docs-code-block"><code>,invert [member]
+,glitch [member]
+,gameboy [member]</code></div>
+          <p>See the full list on the <a href="commands.html" style="color: var(--red-bright);">Commands</a> page under the Manipulation category.</p>
+        </section>
+
+        <section id="utility" class="reveal">
+          <h2>Utility</h2>
+          <p>
+            General-purpose tools: AFK status, AI question answering, translation,
+            reminders, message sniping, emoji management, and more - the everyday
+            commands that don't fit a bigger category.
           </p>
         </section>
 
-        <section id="automation" class="reveal">
-          <h2>Automation</h2>
+        <section id="information" class="reveal">
+          <h2>Information</h2>
           <p>
-            Autoresponders reply automatically to trigger words, autoreacts add
-            reactions to messages containing a keyword, join DMs welcome new members
-            in their DMs, and scheduled messages post - once or on a repeating
-            interval - without you needing to be there to send them.
+            Look-up commands for members, servers, roles, channels, invites, and the
+            bot itself - <code>,userinfo</code>, <code>,serverinfo</code>,
+            <code>,roleinfo</code>, <code>,channelinfo</code>, <code>,botinfo</code>,
+            and more.
+          </p>
+        </section>
+
+        <!-- ==================== RESOURCES ==================== -->
+
+        <section id="embeds" class="reveal">
+          <h2>Embeds</h2>
+          <p>
+            blaid's own script syntax builds a full embed (or plain message) from a
+            block of text - used for welcome/leave/boost messages, tickets, and the
+            standalone <code>,createembed</code> command.
+          </p>
+          <div class="docs-code-block"><code>{embed}
+{title: Some Title}
+{description: Some description}
+{color: #5865F2}
+{thumbnail: (url)}
+{image: (url)}
+{footer: text && icon_url}
+{author: name:X && icon:Y && url:Z}
+{field: Name && Value && inline}
+{button: label:X && url:Y && emoji:Z}</code></div>
+          <p>
+            Multiple <code>{button: ...}</code> lines add multiple buttons to the
+            same message. Everything supports the <a href="#variables" style="color: var(--red-bright);">variables</a> below.
+          </p>
+          <p>
+            The <a href="embed-builder.html" style="color: var(--red-bright);">Embed Builder</a> on
+            this site generates this exact syntax visually with a live preview, if
+            you'd rather not write it by hand.
+          </p>
+        </section>
+
+        <section id="variables" class="reveal">
+          <h2>Variables</h2>
+          <p>
+            Placeholders like <code>{user.mention}</code> that get replaced with real
+            values wherever scripting is supported - welcome messages, tickets,
+            reaction roles, and more.
+          </p>
+          <p>See the full, categorized list on the <a href="variables.html" style="color: var(--red-bright);">Variables</a> reference page.</p>
+        </section>
+
+        <section id="permissionslist" class="reveal">
+          <h2>Permissions</h2>
+          <p>
+            Most commands check for a real Discord permission before running -
+            whichever permission a command needs is shown on its card on the
+            Commands page. The common ones you'll see referenced throughout this
+            documentation:
+          </p>
+          <p>
+            <strong>Administrator</strong>, <strong>Manage Guild</strong>,
+            <strong>Manage Roles</strong>, <strong>Manage Channels</strong>,
+            <strong>Manage Messages</strong>, <strong>Manage Nicknames</strong>,
+            <strong>Manage Webhooks</strong>, <strong>Manage Guild Expressions</strong>,
+            <strong>Ban Members</strong>, <strong>Kick Members</strong>,
+            <strong>Moderate Members</strong>, <strong>View Audit Log</strong>,
+            <strong>Mention Everyone</strong>, <strong>Attach Files</strong>,
+            <strong>Embed Links</strong>.
+          </p>
+          <p>
+            You can also disable individual commands per server with
+            <code>,disable</code> - server-wide, or scoped to a specific channel or
+            role - and bring them back with <code>,enable</code>. And
+            <a href="#fakepermissions" style="color: var(--red-bright);">Fake Permissions</a>
+            let you grant access to a blaid command without the real Discord
+            permission behind it.
           </p>
         </section>
 
         <section id="premium" class="reveal">
           <h2>Plans &amp; Billing</h2>
           <p>
-            blaid has two independent premium plans - see the full breakdown,
-            pricing, and what each one unlocks on the
-            <a href="premium.html" style="color: var(--red-bright);">Premium</a> page.
-            Run <code>,premium</code> in your server any time to buy or manage a plan.
+            Two independent plans - Server Premium and Customize - purchased
+            entirely through Discord's own built-in checkout. Run <code>,premium</code>
+            in your server to see current pricing and buy; premium activates
+            automatically the moment payment goes through.
           </p>
+          <p>Full pricing and refund policy: <a href="premium.html" style="color: var(--red-bright);">Premium</a>.</p>
         </section>
+
       </main>
     </div>
   </div>
