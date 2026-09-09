@@ -32,20 +32,55 @@ function initTopMenu() {
   const panel = document.querySelector(".nav-panel");
   if (!toggle || !panel) return;
 
+  const isMobileNow = () => window.matchMedia("(max-width: 860px)").matches;
+
+  // On mobile only: move the panel to be a direct child of <body>,
+  // and build a real (not pseudo-element) backdrop, also appended
+  // straight to <body>. This sidesteps CSS stacking-context problems
+  // entirely (an ancestor like .page or .topbar having its own
+  // stacking context due to position/transform/filter, trapping the
+  // panel/backdrop below other content no matter what z-index was
+  // set on them) - there's no ancestor left to get trapped inside
+  // once both live directly on body. Desktop is untouched: the panel
+  // stays exactly where it is, inline in the topbar.
+  let backdrop = null;
+  if (isMobileNow()) {
+    document.body.appendChild(panel);
+    backdrop = document.createElement("div");
+    backdrop.className = "mobile-nav-backdrop";
+    document.body.appendChild(backdrop);
+  }
+
+  const openMenu = () => {
+    toggle.classList.add("open");
+    panel.classList.add("open");
+    if (backdrop) {
+      backdrop.classList.add("visible");
+      document.body.classList.add("nav-open");
+    }
+  };
+
+  const closeMenu = () => {
+    toggle.classList.remove("open");
+    panel.classList.remove("open");
+    backdrop?.classList.remove("visible");
+    document.body.classList.remove("nav-open");
+  };
+
   toggle.addEventListener("click", (e) => {
     e.stopPropagation();
-    toggle.classList.toggle("open");
-    panel.classList.toggle("open");
-    document.querySelector(".page")?.classList.toggle("nav-open");
+    panel.classList.contains("open") ? closeMenu() : openMenu();
   });
 
+  backdrop?.addEventListener("click", closeMenu);
+
   document.addEventListener("click", (e) => {
-    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
-      toggle.classList.remove("open");
-      panel.classList.remove("open");
-      document.querySelector(".page")?.classList.remove("nav-open");
+    if (!panel.contains(e.target) && !toggle.contains(e.target) && !(backdrop && backdrop.contains(e.target))) {
+      closeMenu();
     }
   });
+
+  panel.querySelectorAll("a").forEach((a) => a.addEventListener("click", closeMenu));
 }
 
 function initDotMenu() {
