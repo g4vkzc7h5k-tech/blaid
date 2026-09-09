@@ -12,6 +12,11 @@ system that isn't the original guild itself.
 touched or removed. "destructive" mode deletes every current
 non-managed role and every channel first, then rebuilds everything
 from the snapshot - this is irreversible without another backup.
+
+restore_guild's `include` parameter (used by ,recover) lets a caller
+restore only a subset of {"roles", "categories", "channels"} - ,backup
+restore itself always passes all three; ,recover is what actually
+exposes the selective picker to users.
 """
 
 from __future__ import annotations
@@ -115,9 +120,17 @@ async def wipe_guild(guild: discord.Guild) -> None:
         await asyncio.sleep(0.5)
 
 
-async def restore_guild(guild: discord.Guild, snapshot: dict, mode: str) -> dict:
+async def restore_guild(
+    guild: discord.Guild, snapshot: dict, mode: str, include: set[str] | None = None,
+) -> dict:
     """Returns a summary dict: {roles_created, categories_created,
-    channels_created, errors}."""
+    channels_created, errors}.
+
+    include restricts WHICH parts of the snapshot get restored - any
+    subset of {"roles", "categories", "channels"}. None (the default,
+    used by ,backup restore) means "everything". ,recover is what
+    actually lets a user pick a subset via buttons before calling this."""
+    include = include if include is not None else {"roles", "categories", "channels"}
     result = {"roles_created": 0, "categories_created": 0, "channels_created": 0, "errors": 0}
 
     if mode == "destructive":
@@ -125,22 +138,23 @@ async def restore_guild(guild: discord.Guild, snapshot: dict, mode: str) -> dict
 
     # --- roles: created bottom-up so later ones end up higher, closer to backup order
     existing_role_names = {r.name for r in guild.roles}
-    for role_data in snapshot["roles"]:
-        if role_data["name"] in existing_role_names:
-            continue
-        try:
-            await guild.create_role(
-                name=role_data["name"],
-                color=discord.Color(role_data["color"]),
-                hoist=role_data["hoist"],
-                mentionable=role_data["mentionable"],
-                permissions=discord.Permissions(role_data["permissions"]),
-                reason="Blaid backup restore",
-            )
-            result["roles_created"] += 1
-        except discord.HTTPException:
-            result["errors"] += 1
-        await asyncio.sleep(0.5)
+    if "roles" in include:
+        for role_data in snapshot["roles"]:
+            if role_data["name"] in existing_role_names:
+                continue
+            try:
+                await guild.create_role(
+                    name=role_data["name"],
+                    color=discord.Color(role_data["color"]),
+                    hoist=role_data["hoist"],
+                    mentionable=role_data["mentionable"],
+                    permissions=discord.Permissions(role_data["permissions"]),
+                    reason="Blaid backup restore",
+                )
+                result["roles_created"] += 1
+            except discord.HTTPException:
+                result["errors"] += 1
+            await asyncio.sleep(0.5)
 
     role_by_name = {r.name: r for r in guild.roles}
 
@@ -160,47 +174,49 @@ async def restore_guild(guild: discord.Guild, snapshot: dict, mode: str) -> dict
 
     # --- categories
     existing_category_names = {c.name: c for c in guild.categories}
-    for cat_data in snapshot["categories"]:
-        if cat_data["name"] in existing_category_names:
-            continue
-        try:
-            await guild.create_category(
-                cat_data["name"], overwrites=_resolve_overwrites(cat_data["overwrites"]),
-                reason="Blaid backup restore",
-            )
-            result["categories_created"] += 1
-        except discord.HTTPException:
-            result["errors"] += 1
-        await asyncio.sleep(0.5)
+    if "categories" in include:
+        for cat_data in snapshot["categories"]:
+            if cat_data["name"] in existing_category_names:
+                continue
+            try:
+                await guild.create_category(
+                    cat_data["name"], overwrites=_resolve_overwrites(cat_data["overwrites"]),
+                    reason="Blaid backup restore",
+                )
+                result["categories_created"] += 1
+            except discord.HTTPException:
+                result["errors"] += 1
+            await asyncio.sleep(0.5)
 
     category_by_name = {c.name: c for c in guild.categories}
 
     # --- channels
     existing_channel_names = {c.name for c in guild.channels if not isinstance(c, discord.CategoryChannel)}
-    for chan_data in snapshot["channels"]:
-        if chan_data["name"] in existing_channel_names:
-            continue
+    if "channels" in include:
+        for chan_data in snapshot["channels"]:
+            if chan_data["name"] in existing_channel_names:
+                continue
 
-        category = category_by_name.get(chan_data["category_name"]) if chan_data["category_name"] else None
-        overwrites = _resolve_overwrites(chan_data["overwrites"])
+            category = category_by_name.get(chan_data["category_name"]) if chan_data["category_name"] else None
+            overwrites = _resolve_overwrites(chan_data["overwrites"])
 
-        try:
-            if chan_data["type"] == "text":
-                await guild.create_text_channel(
-                    chan_data["name"], category=category, topic=chan_data.get("topic"),
-                    nsfw=chan_data.get("nsfw", False), slowmode_delay=chan_data.get("slowmode_delay", 0),
-                    overwrites=overwrites, reason="Blaid backup restore",
-                )
-            else:
-                await guild.create_voice_channel(
-                    chan_data["name"], category=category, bitrate=chan_data.get("bitrate", 64000),
-                    user_limit=chan_data.get("user_limit", 0), overwrites=overwrites,
-                    reason="Blaid backup restore",
-                )
-            result["channels_created"] += 1
-        except discord.HTTPException:
-            result["errors"] += 1
-        await asyncio.sleep(0.5)
+            try:
+                if chan_data["type"] == "text":
+                    await guild.create_text_channel(
+                        chan_data["name"], category=category, topic=chan_data.get("topic"),
+                        nsfw=chan_data.get("nsfw", False), slowmode_delay=chan_data.get("slowmode_delay", 0),
+                        overwrites=overwrites, reason="Blaid backup restore",
+                    )
+                else:
+                    await guild.create_voice_channel(
+                        chan_data["name"], category=category, bitrate=chan_data.get("bitrate", 64000),
+                        user_limit=chan_data.get("user_limit", 0), overwrites=overwrites,
+                        reason="Blaid backup restore",
+                    )
+                result["channels_created"] += 1
+            except discord.HTTPException:
+                result["errors"] += 1
+            await asyncio.sleep(0.5)
 
     return result
 
