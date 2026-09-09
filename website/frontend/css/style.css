@@ -1061,6 +1061,11 @@ select:focus { border-color: var(--red); }
   font-weight: 600;
   cursor: pointer;
   outline: none;
+  max-width: 130px;
+}
+
+@media (max-width: 860px) {
+  .lang-select { max-width: 90px; font-size: 0.74rem; padding: 6px 6px; }
 }
 
 .lang-select:hover { border-color: var(--red); color: var(--text); }
