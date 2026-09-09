@@ -241,21 +241,27 @@ body::before {
 
 .nav-panel a:hover { background: var(--bg-raised-2); color: var(--text); }
 
-/* Mobile: nav becomes a centered modal, with a dimmed backdrop behind it */
+/* Mobile: nav becomes a centered modal. Both the panel and the
+   backdrop are moved/created directly on <body> by JS (see
+   initTopMenu) specifically to avoid ancestor stacking-context traps
+   (.page/.topbar having position/transform/filter that would make
+   z-index comparisons behave unexpectedly) - so this CSS only needs
+   to style them, not fight for stacking order. */
+.mobile-nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+}
+
+.mobile-nav-backdrop.visible { display: block; }
+
+body.nav-open { overflow: hidden; }
+
 @media (max-width: 860px) {
-  body.nav-open {
-    overflow: hidden; /* stops background scroll + any horizontal scrollbar gap while the menu is open */
-  }
-
-  body.nav-open::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 44;
-  }
-
   .nav-panel {
+    position: fixed;
     top: 50%;
     left: 50%;
     right: auto;
@@ -266,9 +272,13 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .nav-panel.open { transform: translate(-50%, -50%) scale(1); }
+  .nav-panel.open { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
 
   .nav-panel::before {
     content: "Menu";
@@ -280,13 +290,6 @@ body::before {
     margin-bottom: 6px;
     border-bottom: 1px solid var(--border-soft);
   }
-
-  /* .nav-panel lives inside .topbar, which creates its own stacking
-     context (position: sticky + z-index) - without raising .topbar's
-     z-index above the backdrop's, the backdrop paints over the whole
-     header including the menu nested inside it, no matter what
-     z-index .nav-panel itself has. */
-  .topbar { z-index: 46; }
 }
 
 .dot-panel {
