@@ -806,7 +806,7 @@ class Moderation(commands.Cog):
 
     @command_meta(
         category="Moderation",
-        description="Jail a member by assigning the configured jail role.",
+        description="Jails a member using the jail role created by ,setup. Omit the duration for an indefinite jail.",
         syntax=",jail <member> [duration] [reason]",
         examples=[",jail @User 1h Spamming", ",jail @User Repeated warnings"],
         permissions=["Moderate Members"],
