@@ -153,43 +153,6 @@ body::before {
   .nav-panel a:hover { background: none !important; color: var(--red-bright); }
 }
 
-/* Mobile: nav becomes a centered modal, with a dimmed backdrop behind it */
-@media (max-width: 860px) {
-  body.nav-open::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 44;
-  }
-
-  .nav-panel {
-    top: 50%;
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -50%) scale(0.95);
-    width: min(300px, 86vw);
-    max-height: 78vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .nav-panel.open { transform: translate(-50%, -50%) scale(1); }
-
-  .nav-panel::before {
-    content: "Menu";
-    display: block;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.05rem;
-    padding: 8px 12px 14px;
-    margin-bottom: 6px;
-    border-bottom: 1px solid var(--border-soft);
-  }
-}
-
 .wordmark {
   font-family: var(--font-display);
   font-weight: 600;
@@ -277,6 +240,47 @@ body::before {
 }
 
 .nav-panel a:hover { background: var(--bg-raised-2); color: var(--text); }
+
+/* Mobile: nav becomes a centered modal, with a dimmed backdrop behind it */
+@media (max-width: 860px) {
+  body.nav-open {
+    overflow: hidden; /* stops background scroll + any horizontal scrollbar gap while the menu is open */
+  }
+
+  body.nav-open::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 44;
+  }
+
+  .nav-panel {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%) scale(0.95);
+    width: min(300px, 86vw);
+    max-height: 78vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-panel.open { transform: translate(-50%, -50%) scale(1); }
+
+  .nav-panel::before {
+    content: "Menu";
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 8px 12px 14px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+}
 
 .dot-panel {
   position: absolute;
@@ -1061,6 +1065,11 @@ select:focus { border-color: var(--red); }
   font-weight: 600;
   cursor: pointer;
   outline: none;
+  max-width: 130px;
+}
+
+@media (max-width: 860px) {
+  .lang-select { max-width: 90px; font-size: 0.74rem; padding: 6px 6px; }
 }
 
 .lang-select:hover { border-color: var(--red); color: var(--text); }
