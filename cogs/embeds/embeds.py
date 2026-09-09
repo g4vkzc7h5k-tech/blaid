@@ -11,7 +11,6 @@ from __future__ import annotations
 from discord.ext import commands
 
 from core.checks import has_permission_or_fake
-
 from core.command_meta import command_meta
 from core.script_parser import build_button_view, parse_script
 from core.variables import resolve_variables
@@ -29,20 +28,18 @@ class Embeds(commands.Cog):
         permissions=["Manage Guild"],
         aliases=["ce"],
     )
-    @commands.hybrid_command(name="createembed", aliases=["ce"])
+    @commands.command(name="createembed", aliases=["ce"], with_app_command=False)
     @has_permission_or_fake("manage_guild")
     @commands.guild_only()
     async def createembed(self, ctx: commands.Context, *, script: str):
         resolved = resolve_variables(script, guild=ctx.guild, member=ctx.author, channel=ctx.channel)
         parsed = parse_script(resolved)
-
         if parsed.embed is None and not parsed.content:
             await ctx.error(
                 "Nothing to send - include at least `{content: ...}`/`{message: ...}` "
                 "or an embed field like `{title: ...}`/`{description: ...}`."
             )
             return
-
         view = build_button_view(parsed.buttons)
         await ctx.send(content=parsed.content, embed=parsed.embed, view=view)
 
