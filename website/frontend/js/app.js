@@ -36,14 +36,14 @@ function initTopMenu() {
     e.stopPropagation();
     toggle.classList.toggle("open");
     panel.classList.toggle("open");
-    document.body.classList.toggle("nav-open");
+    document.querySelector(".page")?.classList.toggle("nav-open");
   });
 
   document.addEventListener("click", (e) => {
     if (!panel.contains(e.target) && !toggle.contains(e.target)) {
       toggle.classList.remove("open");
       panel.classList.remove("open");
-      document.body.classList.remove("nav-open");
+      document.querySelector(".page")?.classList.remove("nav-open");
     }
   });
 }
