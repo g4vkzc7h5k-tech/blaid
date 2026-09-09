@@ -34,14 +34,14 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
         </button>
         <div class="dot-panel">
-          <a data-support-link href="#">Support Server</a>
-          <a href="index.html">Home</a>
+          <a data-support-link href="#" data-i18n="footer_support">Support Server</a>
+          <a href="index.html" data-i18n="nav_home">Home</a>
         </div>
       </div>
     </header>
 
     <div class="docs-crumb">
-      <span>Docs</span>
+      <span data-i18n="docs_crumb">Docs</span>
       <span class="sep">/</span>
       <span class="current">Introduction</span>
     </div>
@@ -52,18 +52,18 @@
       <aside class="docs-sidebar">
         <div class="docs-search-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input type="text" id="docs-search-input" placeholder="Search docs...">
+          <input type="text" id="docs-search-input" placeholder="Search docs..." data-i18n-placeholder="docs_search_ph">
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">GETTING STARTED</p>
+          <p class="docs-nav-label" data-i18n="docs_cat_start">GETTING STARTED</p>
           <a href="#introduction" class="active">Introduction</a>
           <a href="#setup">Server Setup</a>
           <a href="#prefixes">Prefixes</a>
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">SECURITY</p>
+          <p class="docs-nav-label" data-i18n="docs_cat_security">SECURITY</p>
           <a href="#antinuke">Antinuke</a>
           <a href="#antiraid">Antiraid</a>
           <a href="#automod">Automod</a>
@@ -74,7 +74,7 @@
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">SERVER CONFIGURATION</p>
+          <p class="docs-nav-label" data-i18n="docs_cat_serverconfig">SERVER CONFIGURATION</p>
 
           <button class="docs-nav-expand" data-target="sub-automation">Automation</button>
           <div class="docs-nav-sub" id="sub-automation">
@@ -120,7 +120,7 @@
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">MISCELLANEOUS</p>
+          <p class="docs-nav-label" data-i18n="docs_cat_misc">MISCELLANEOUS</p>
           <a href="#music">Music</a>
           <a href="#giveaways">Giveaways</a>
           <a href="#counting">Counting</a>
@@ -134,7 +134,7 @@
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">RESOURCES</p>
+          <p class="docs-nav-label" data-i18n="docs_cat_resources">RESOURCES</p>
           <button class="docs-nav-expand" data-target="sub-scripting">Scripting</button>
           <div class="docs-nav-sub" id="sub-scripting">
             <a href="#embeds">Embeds</a>
@@ -144,13 +144,13 @@
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">REFERENCE</p>
-          <a href="commands.html">Commands</a>
+          <p class="docs-nav-label" data-i18n="docs_cat_reference">REFERENCE</p>
+          <a href="commands.html" data-i18n="nav_commands">Commands</a>
           <a href="variables.html">Variables Reference</a>
         </div>
 
         <div class="docs-nav-group">
-          <p class="docs-nav-label">PREMIUM</p>
+          <p class="docs-nav-label" data-i18n="docs_cat_premium">PREMIUM</p>
           <a href="#premium">Plans &amp; Billing</a>
         </div>
       </aside>
@@ -523,10 +523,7 @@
           <h2>AutoPFP</h2>
           <p>
             Posts a fresh image to a channel automatically on whatever interval you
-            set - currently sources cat images from TheCatAPI. (Anime sources were
-            tried and dropped: PebbleHost's shared hosting IP got blocked by every
-            free anime image API tested - a hosting limitation, not a feature
-            choice, and it can come back if hosting ever moves to a dedicated IP.)
+            set - currently sources cat images.
           </p>
           <div class="docs-code-block"><code>,autopfp add (channel)
 ,autopfp interval (minutes)
