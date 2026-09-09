@@ -5,6 +5,7 @@
 function initLoader() {
   const loader = document.querySelector(".loader");
   const page = document.querySelector(".page");
+  const logo = document.querySelector(".loader-logo");
   if (!loader || !page) return;
 
   const reveal = () => {
@@ -12,14 +13,18 @@ function initLoader() {
     page.classList.add("revealed");
   };
 
-  const minDelay = new Promise((resolve) => setTimeout(resolve, 550));
+  // The glow-then-shrink animation (see loader-glow-shrink in CSS) is
+  // 1.4s - the page must never open before that finishes, so it's the
+  // floor here, not just a nice-to-have minimum.
+  const animationDuration = 1400;
+  const minDelay = new Promise((resolve) => setTimeout(resolve, animationDuration));
   const ready = new Promise((resolve) => {
     if (document.readyState === "complete") resolve();
     else window.addEventListener("load", resolve, { once: true });
   });
 
   Promise.all([minDelay, ready]).then(reveal);
-  setTimeout(reveal, 1800);
+  setTimeout(reveal, 2600); // hard ceiling in case something hangs
 }
 
 function initTopMenu() {
@@ -31,12 +36,14 @@ function initTopMenu() {
     e.stopPropagation();
     toggle.classList.toggle("open");
     panel.classList.toggle("open");
+    document.body.classList.toggle("nav-open");
   });
 
   document.addEventListener("click", (e) => {
     if (!panel.contains(e.target) && !toggle.contains(e.target)) {
       toggle.classList.remove("open");
       panel.classList.remove("open");
+      document.body.classList.remove("nav-open");
     }
   });
 }
@@ -79,6 +86,78 @@ function initDocsMobileNav() {
   });
   overlay.addEventListener("click", close);
   sidebar.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
+}
+
+function initDocsSections() {
+  const sidebarLinks = document.querySelectorAll(".docs-sidebar a[href^='#']");
+  const sections = document.querySelectorAll(".docs-content > section[id]");
+  const crumbCurrent = document.querySelector(".docs-crumb .current");
+  if (!sidebarLinks.length || !sections.length) return;
+
+  // Expandable sub-groups (Automation / Roles / Messages / Scripting)
+  document.querySelectorAll(".docs-nav-expand").forEach((btn) => {
+    const target = document.getElementById(btn.dataset.target);
+    if (!target) return;
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("open");
+      target.classList.toggle("open");
+    });
+  });
+
+  function showSection(id) {
+    sections.forEach((s) => (s.style.display = s.id === id ? "block" : "none"));
+    sidebarLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === `#${id}`));
+    if (crumbCurrent) {
+      const matchingLink = [...sidebarLinks].find((a) => a.getAttribute("href") === `#${id}`);
+      if (matchingLink) crumbCurrent.textContent = matchingLink.textContent;
+    }
+    // If the target link lives inside a collapsed sub-group, open that
+    // group too, so the active item is actually visible.
+    const activeLink = [...sidebarLinks].find((a) => a.getAttribute("href") === `#${id}`);
+    const parentSub = activeLink?.closest(".docs-nav-sub");
+    if (parentSub) {
+      parentSub.classList.add("open");
+      const expandBtn = document.querySelector(`.docs-nav-expand[data-target="${parentSub.id}"]`);
+      expandBtn?.classList.add("open");
+    }
+    document.querySelector(".docs-content")?.scrollTo({ top: 0 });
+  }
+
+  sidebarLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const href = link.getAttribute("href");
+      if (!href.startsWith("#")) return; // full-page links (Commands, Variables) behave normally
+      e.preventDefault();
+      const id = href.slice(1);
+      showSection(id);
+      history.replaceState(null, "", href);
+    });
+  });
+
+  // Land on whichever section the URL hash points to (or the first one)
+  const initialId = (window.location.hash || sidebarLinks[0].getAttribute("href")).slice(1);
+  if (document.getElementById(initialId)) {
+    showSection(initialId);
+  }
+
+  // Search: filters the sidebar link list by text match - matching
+  // links stay, non-matching ones (and now-empty group labels) hide.
+  const searchInput = document.querySelector("#docs-search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.toLowerCase().trim();
+      document.querySelectorAll(".docs-nav-group").forEach((group) => {
+        let anyVisible = false;
+        group.querySelectorAll("a").forEach((a) => {
+          const matches = !q || a.textContent.toLowerCase().includes(q);
+          a.classList.toggle("search-hidden", !matches);
+          if (matches) anyVisible = true;
+        });
+        const label = group.querySelector(".docs-nav-label");
+        if (label) label.classList.toggle("search-hidden", !anyVisible);
+      });
+    });
+  }
 }
 
 const _isMobile = window.matchMedia("(max-width: 860px)").matches;
@@ -637,11 +716,57 @@ function initTicketBuilder() {
     });
 }
 
+function initSiteLoginChip() {
+  const chip = document.querySelector("#login-chip");
+  if (!chip) return;
+
+  chip.href = `${API_BASE}/api/auth/login`;
+
+  fetch(`${API_BASE}/api/auth/me`, { credentials: "include" })
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data.logged_in) return; // stays as the default "Login" link
+
+      const avatarUrl = data.user.avatar
+        ? `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png`
+        : "https://cdn.discordapp.com/embed/avatars/0.png";
+
+      chip.classList.add("has-avatar");
+      chip.href = "#";
+      chip.innerHTML = `<img src="${avatarUrl}" alt=""> ${data.user.username}`;
+      chip.addEventListener("click", async (e) => {
+        e.preventDefault();
+        if (!confirm("Log out?")) return;
+        await fetch(`${API_BASE}/api/auth/logout`, { method: "POST", credentials: "include" });
+        window.location.reload();
+      });
+    })
+    .catch(() => {
+      // stays as the default "Login" link on any error
+    });
+}
+
+// NOTE: language switching is UI-only for now - it remembers the
+// choice but doesn't yet translate any page content. Wiring up real
+// translations is a separate piece of work.
+function initLangSelect() {
+  const select = document.querySelector("#lang-select");
+  if (!select) return;
+
+  const saved = localStorage.getItem("blaid_lang");
+  if (saved) select.value = saved;
+
+  select.addEventListener("change", () => {
+    localStorage.setItem("blaid_lang", select.value);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initLoader();
   initTopMenu();
   initDotMenu();
   initDocsMobileNav();
+  initDocsSections();
   applyLinks();
   initReveal();
   loadCommands();
@@ -649,4 +774,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initEmbedBuilder();
   loadVariables();
   initTicketBuilder();
+  initSiteLoginChip();
+  initLangSelect();
 });
