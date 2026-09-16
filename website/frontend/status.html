@@ -40,30 +40,83 @@
     </header>
 
     <div class="status-shell">
-      <h1 data-i18n="status_title">Status</h1>
-      <div class="status-hero">
-        <p id="status-line"><span class="status-dot"></span><span data-i18n="status_checking">Checking...</span></p>
+
+      <div class="status-card-box status-headline-box reveal">
+        <h1 data-i18n="status_title">blaid service status</h1>
+        <p class="status-subtitle" data-i18n="status_subtitle">Real-time availability and performance across the blaid platform.</p>
+
+        <div class="status-overall-row">
+          <span class="status-dot" id="status-overall-dot"></span>
+          <span id="status-overall-text" data-i18n="status_checking">Checking...</span>
+        </div>
+
+        <div class="status-metrics-row">
+          <div class="status-metric">
+            <p class="value" id="stat-guilds">—</p>
+            <p class="label" data-i18n="status_servers">Servers</p>
+          </div>
+          <div class="status-metric">
+            <p class="value" id="stat-users">—</p>
+            <p class="label" data-i18n="status_users">Users</p>
+          </div>
+          <div class="status-metric">
+            <p class="value" id="stat-latency">—</p>
+            <p class="label" data-i18n="status_latency">Latency</p>
+          </div>
+          <div class="status-metric">
+            <p class="value" id="stat-uptime">—</p>
+            <p class="label" data-i18n="status_uptime">Uptime</p>
+          </div>
+        </div>
       </div>
 
-      <div class="status-grid">
-        <div class="status-card reveal">
-          <div class="value" id="stat-guilds">—</div>
-          <div class="label" data-i18n="status_servers">Servers</div>
+      <div class="status-card-box status-incidents-box reveal" id="status-incidents-box" style="display: none;">
+        <h2 data-i18n="status_incidents_title">Active Incidents</h2>
+        <div id="status-incidents-list"></div>
+      </div>
+
+      <div class="status-card-box reveal">
+        <h2 data-i18n="status_group_core">Core Infrastructure</h2>
+        <div class="status-service-row">
+          <span data-i18n="status_svc_bot">Bot</span>
+          <span class="service-pill" id="svc-bot"><span class="pill-dot"></span><span class="pill-text">—</span></span>
         </div>
-        <div class="status-card reveal">
-          <div class="value" id="stat-users">—</div>
-          <div class="label" data-i18n="status_users">Users</div>
+        <div class="status-service-row">
+          <span data-i18n="status_svc_database">Database</span>
+          <span class="service-pill" id="svc-database"><span class="pill-dot"></span><span class="pill-text">—</span></span>
         </div>
-        <div class="status-card reveal">
-          <div class="value" id="stat-latency">—</div>
-          <div class="label" data-i18n="status_latency">Latency</div>
-        </div>
-        <div class="status-card reveal">
-          <div class="value" id="stat-uptime">—</div>
-          <div class="label" data-i18n="status_uptime">Uptime</div>
+        <div class="status-service-row">
+          <span data-i18n="status_svc_backend">Website Backend</span>
+          <span class="service-pill" id="svc-backend"><span class="pill-dot"></span><span class="pill-text">—</span></span>
         </div>
       </div>
+
+      <div class="status-card-box reveal">
+        <h2 data-i18n="status_group_platform">Platform Service</h2>
+        <div class="status-service-row">
+          <span data-i18n="status_svc_image">Image API</span>
+          <span class="service-pill unmonitored" id="svc-image"><span class="pill-dot"></span><span class="pill-text" data-i18n="status_unmonitored">Not independently monitored</span></span>
+        </div>
+      </div>
+
+      <div class="status-card-box reveal">
+        <h2 data-i18n="status_group_integrations">Platform Integrations</h2>
+        <div class="status-service-row">
+          <span>Last.fm</span>
+          <span class="service-pill unmonitored"><span class="pill-dot"></span><span class="pill-text" data-i18n="status_unmonitored">Not independently monitored</span></span>
+        </div>
+        <div class="status-service-row">
+          <span>Twitch</span>
+          <span class="service-pill unmonitored"><span class="pill-dot"></span><span class="pill-text" data-i18n="status_unmonitored">Not independently monitored</span></span>
+        </div>
+        <div class="status-service-row">
+          <span>YouTube</span>
+          <span class="service-pill unmonitored"><span class="pill-dot"></span><span class="pill-text" data-i18n="status_unmonitored">Not independently monitored</span></span>
+        </div>
+      </div>
+
     </div>
+
     <footer class="site-footer">
       <div class="footer-inner">
         <span class="footer-brand">blaid.</span>
