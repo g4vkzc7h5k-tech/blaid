@@ -41,6 +41,7 @@
     </header>
 
     <section class="hero">
+      <canvas id="dot-field" class="dot-field"></canvas>
       <h1 class="reveal" data-i18n="home_title">blaid is Discord's premier all-in-one app</h1>
       <p class="lead reveal" data-i18n="home_lead">
         Meet the leading bot for management and engagement. Built to elevate your
@@ -52,14 +53,70 @@
         <a class="btn secondary" href="commands.html" data-i18n="nav_commands">Commands</a>
       </div>
     </section>
+
+    <section class="features">
+      <div class="features-intro">
+        <p class="features-eyebrow reveal" data-i18n="features_eyebrow">Everything in one bot</p>
+        <h2 class="reveal" data-i18n="features_title">Built to replace half a dozen bots</h2>
+        <p class="features-lead reveal" data-i18n="features_lead">Every category below is a real, working part of blaid - not a roadmap.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <span class="feature-emoji">🛡️</span>
+          <h3 data-i18n="feat_mod_title">Moderation & Security</h3>
+          <p data-i18n="feat_mod_desc">Full moderation suite, antinuke, antiraid, honeypots, and a verification gate for risky new accounts.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-emoji">🎫</span>
+          <h3 data-i18n="feat_tickets_title">Tickets & VoiceMaster</h3>
+          <p data-i18n="feat_tickets_desc">Visually build ticket panels on this site, plus join-to-create voice channels with full owner controls.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-emoji">📈</span>
+          <h3 data-i18n="feat_levels_title">Leveling & Economy</h3>
+          <p data-i18n="feat_levels_desc">XP, custom level-up cards, role rewards, and a full economy with 12 gambling games.</p>
+        </div>
+        <div class="feature-card reveal">
+          <span class="feature-emoji">🎉</span>
+          <h3 data-i18n="feat_fun_title">Fun & Utility</h3>
+          <p data-i18n="feat_fun_desc">Tic-Tac-Toe, BlackTea, AI answers, reaction/button roles, and a full embed scripting system.</p>
+        </div>
+      </div>
+    </section>
+
     <footer class="site-footer">
-      <div class="footer-inner">
-        <span class="footer-brand">blaid.</span>
-        <div class="footer-links">
-          <a data-support-link href="#" data-i18n="footer_support">Support Server</a>
-          <a href="docs.html" data-i18n="nav_docs">Documentation</a>
+      <div class="footer-inner footer-inner-grid">
+        <div class="footer-brand-col">
+          <span class="footer-brand">blaid.</span>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title" data-i18n="footer_cat_docs">Documentation</p>
+          <a href="docs.html#introduction" data-i18n="footer_getting_started">Getting Started</a>
+          <a href="docs.html#moderation" data-i18n="footer_moderation">Moderation</a>
+          <a href="docs.html#antinuke" data-i18n="footer_antinuke">Antinuke</a>
+          <a href="docs.html#music" data-i18n="footer_music">Music</a>
+          <a href="docs.html#levels" data-i18n="footer_levels">Levels</a>
+          <a href="docs.html#voicemaster" data-i18n="footer_voicemaster">VoiceMaster</a>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title" data-i18n="footer_cat_support">Support</p>
+          <a data-support-link href="#" data-i18n="nav_discord">Discord</a>
+          <a data-support-link href="#" data-i18n="footer_get_help">Get Help</a>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title" data-i18n="footer_cat_legal">Legal</p>
           <a href="privacy.html" data-i18n="footer_privacy">Privacy</a>
           <a href="terms.html" data-i18n="footer_terms">Terms</a>
+          <a href="premium.html#refund-policy" data-i18n="footer_refunds">Refunds</a>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title" data-i18n="footer_cat_community">Community</p>
+          <a class="footer-cta" data-support-link href="#" data-i18n="footer_join_discord">Join our Discord</a>
         </div>
       </div>
     </footer>
