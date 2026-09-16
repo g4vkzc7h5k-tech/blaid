@@ -496,28 +496,80 @@ function formatUptime(seconds) {
 }
 
 async function loadStatus() {
-  const line = document.querySelector("#status-line");
-  if (!line) return;
+  const overallDot = document.querySelector("#status-overall-dot");
+  const overallText = document.querySelector("#status-overall-text");
+  if (!overallDot && !overallText) return; // old single-line layout not present - nothing to do
+
+  const setPill = (id, online, textOnline, textOffline) => {
+    const el = document.querySelector(`#${id}`);
+    if (!el) return;
+    el.classList.toggle("offline", !online);
+    el.querySelector(".pill-text").textContent = online ? textOnline : textOffline;
+  };
 
   try {
     const res = await fetch(`${API_BASE}/api/status`);
     const data = await res.json();
 
+    // The very fact this fetch succeeded means the website backend
+    // itself is reachable and responding - that's a real signal, not
+    // a guess, so it's safe to show as genuinely monitored.
+    setPill("svc-backend", true, "Operational", "Down");
+
     if (!data.online) {
-      line.innerHTML = `<span class="status-dot offline"></span>Offline${data.reason ? " — " + data.reason : ""}`;
+      overallDot.className = "status-dot offline";
+      overallText.textContent = data.reason ? `Offline — ${data.reason}` : "Offline";
+      setPill("svc-bot", false, "Operational", "Down");
+      setPill("svc-database", false, "Operational", "Unreachable");
+      showIncident(data.reason || "The bot is currently offline.");
       return;
     }
 
-    line.innerHTML = `<span class="status-dot online"></span>Online`;
-    document.querySelector("#stat-guilds").textContent = data.guild_count?.toLocaleString() ?? "—";
-    document.querySelector("#stat-users").textContent = data.user_count?.toLocaleString() ?? "—";
-    document.querySelector("#stat-latency").textContent = data.latency_ms != null ? `${data.latency_ms}ms` : "—";
-    const uptimeSeconds = Date.now() / 1000 - data.started_at;
-    document.querySelector("#stat-uptime").textContent = formatUptime(uptimeSeconds);
+    overallDot.className = "status-dot online";
+    overallText.textContent = "All systems operational";
+    setPill("svc-bot", true, "Operational", "Down");
+    // The bot's SQLite database is embedded in the same process - if
+    // the bot is reporting itself online at all, its DB connection is
+    // inherently working too (there's no code path where the bot
+    // stays up with a broken DB), so this is a real inference, not a
+    // fabricated green light.
+    setPill("svc-database", true, "Operational", "Unreachable");
+    hideIncident();
+
+    const guildsEl = document.querySelector("#stat-guilds");
+    const usersEl = document.querySelector("#stat-users");
+    const latencyEl = document.querySelector("#stat-latency");
+    const uptimeEl = document.querySelector("#stat-uptime");
+    if (guildsEl) guildsEl.textContent = data.guild_count?.toLocaleString() ?? "—";
+    if (usersEl) usersEl.textContent = data.user_count?.toLocaleString() ?? "—";
+    if (latencyEl) latencyEl.textContent = data.latency_ms != null ? `${data.latency_ms}ms` : "—";
+    if (uptimeEl) {
+      const uptimeSeconds = Date.now() / 1000 - data.started_at;
+      uptimeEl.textContent = formatUptime(uptimeSeconds);
+    }
   } catch (err) {
-    line.innerHTML = `<span class="status-dot offline"></span>Couldn't reach the API.`;
+    overallDot.className = "status-dot offline";
+    overallText.textContent = "Couldn't reach the API";
+    setPill("svc-backend", false, "Operational", "Unreachable");
+    setPill("svc-bot", false, "Operational", "Unknown");
+    setPill("svc-database", false, "Operational", "Unknown");
+    showIncident("Couldn't reach the status API right now.");
   }
 }
+
+function showIncident(message) {
+  const box = document.querySelector("#status-incidents-box");
+  const list = document.querySelector("#status-incidents-list");
+  if (!box || !list) return;
+  list.innerHTML = `<p class="incident-item">${message}</p>`;
+  box.style.display = "block";
+}
+
+function hideIncident() {
+  const box = document.querySelector("#status-incidents-box");
+  if (box) box.style.display = "none";
+}
+
 
 // ---------------------------------------------------------- variables page
 
@@ -856,6 +908,11 @@ function initSiteLoginChip() {
 // the selected language until it gets the same data-i18n treatment.
 const TRANSLATIONS = {
   en: {
+    status_subtitle: "Real-time availability and performance across the blaid platform.",
+    status_incidents_title: "Active Incidents",
+    status_group_core: "Core Infrastructure", status_svc_bot: "Bot", status_svc_database: "Database", status_svc_backend: "Website Backend",
+    status_group_platform: "Platform Service", status_svc_image: "Image API",
+    status_group_integrations: "Platform Integrations", status_unmonitored: "Not independently monitored",
     docs_cat_start: "GETTING STARTED", docs_cat_security: "SECURITY", docs_cat_serverconfig: "SERVER CONFIGURATION",
     docs_cat_misc: "MISCELLANEOUS", docs_cat_resources: "RESOURCES", docs_cat_reference: "REFERENCE", docs_cat_premium: "PREMIUM",
     docs_crumb: "Docs", docs_search_ph: "Search docs...",
@@ -897,6 +954,11 @@ const TRANSLATIONS = {
     premium_get_customize: "Get Customize",
   },
   de: {
+    status_subtitle: "Verfügbarkeit und Leistung der gesamten blaid-Plattform in Echtzeit.",
+    status_incidents_title: "Aktuelle Störungen",
+    status_group_core: "Kern-Infrastruktur", status_svc_bot: "Bot", status_svc_database: "Datenbank", status_svc_backend: "Website-Backend",
+    status_group_platform: "Plattform-Dienst", status_svc_image: "Bild-API",
+    status_group_integrations: "Plattform-Integrationen", status_unmonitored: "Wird nicht einzeln überwacht",
     docs_cat_start: "ERSTE SCHRITTE", docs_cat_security: "SICHERHEIT", docs_cat_serverconfig: "SERVER-EINSTELLUNGEN",
     docs_cat_misc: "SONSTIGES", docs_cat_resources: "RESSOURCEN", docs_cat_reference: "REFERENZ", docs_cat_premium: "PREMIUM",
     docs_crumb: "Doku", docs_search_ph: "Doku durchsuchen...",
@@ -938,6 +1000,11 @@ const TRANSLATIONS = {
     premium_get_customize: "Customize holen",
   },
   fr: {
+    status_subtitle: "Disponibilité et performance en temps réel sur toute la plateforme blaid.",
+    status_incidents_title: "Incidents en cours",
+    status_group_core: "Infrastructure principale", status_svc_bot: "Bot", status_svc_database: "Base de données", status_svc_backend: "Backend du site",
+    status_group_platform: "Service de plateforme", status_svc_image: "API image",
+    status_group_integrations: "Intégrations de plateforme", status_unmonitored: "Non surveillé individuellement",
     docs_cat_start: "PREMIERS PAS", docs_cat_security: "SÉCURITÉ", docs_cat_serverconfig: "CONFIGURATION DU SERVEUR",
     docs_cat_misc: "DIVERS", docs_cat_resources: "RESSOURCES", docs_cat_reference: "RÉFÉRENCE", docs_cat_premium: "PREMIUM",
     docs_crumb: "Docs", docs_search_ph: "Rechercher dans la doc...",
@@ -979,6 +1046,11 @@ const TRANSLATIONS = {
     premium_get_customize: "Obtenir Customize",
   },
   es: {
+    status_subtitle: "Disponibilidad y rendimiento en tiempo real de toda la plataforma blaid.",
+    status_incidents_title: "Incidentes activos",
+    status_group_core: "Infraestructura principal", status_svc_bot: "Bot", status_svc_database: "Base de datos", status_svc_backend: "Backend del sitio",
+    status_group_platform: "Servicio de plataforma", status_svc_image: "API de imágenes",
+    status_group_integrations: "Integraciones de plataforma", status_unmonitored: "No monitoreado de forma independiente",
     docs_cat_start: "PRIMEROS PASOS", docs_cat_security: "SEGURIDAD", docs_cat_serverconfig: "CONFIGURACIÓN DEL SERVIDOR",
     docs_cat_misc: "VARIOS", docs_cat_resources: "RECURSOS", docs_cat_reference: "REFERENCIA", docs_cat_premium: "PREMIUM",
     docs_crumb: "Docs", docs_search_ph: "Buscar en la documentación...",
@@ -1020,6 +1092,11 @@ const TRANSLATIONS = {
     premium_get_customize: "Obtener Customize",
   },
   pt: {
+    status_subtitle: "Disponibilidade e desempenho em tempo real de toda a plataforma blaid.",
+    status_incidents_title: "Incidentes ativos",
+    status_group_core: "Infraestrutura principal", status_svc_bot: "Bot", status_svc_database: "Banco de dados", status_svc_backend: "Backend do site",
+    status_group_platform: "Serviço de plataforma", status_svc_image: "API de imagem",
+    status_group_integrations: "Integrações de plataforma", status_unmonitored: "Não monitorado individualmente",
     docs_cat_start: "PRIMEIROS PASSOS", docs_cat_security: "SEGURANÇA", docs_cat_serverconfig: "CONFIGURAÇÃO DO SERVIDOR",
     docs_cat_misc: "DIVERSOS", docs_cat_resources: "RECURSOS", docs_cat_reference: "REFERÊNCIA", docs_cat_premium: "PREMIUM",
     docs_crumb: "Docs", docs_search_ph: "Buscar na documentação...",
