@@ -238,6 +238,72 @@ function applyLinks() {
   });
 }
 
+// ---------------------------------------------------------- homepage dot field
+//
+// A small number of soft dots drifting slowly across the hero
+// background on the homepage only. Pure canvas, no external libs,
+// very low dot count and speed to stay cheap on mobile - pauses
+// entirely when the tab isn't visible.
+
+function initDotField() {
+  const canvas = document.querySelector("#dot-field");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  let width, height, dots;
+  const DOT_COUNT = _isMobile ? 26 : 46;
+
+  function resize() {
+    width = canvas.width = canvas.offsetWidth * devicePixelRatio;
+    height = canvas.height = canvas.offsetHeight * devicePixelRatio;
+  }
+
+  function makeDots() {
+    dots = Array.from({ length: DOT_COUNT }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: (Math.random() * 1.4 + 0.6) * devicePixelRatio,
+      vx: (Math.random() - 0.5) * 0.12 * devicePixelRatio,
+      vy: (Math.random() - 0.5) * 0.12 * devicePixelRatio,
+      a: Math.random() * 0.35 + 0.12,
+    }));
+  }
+
+  resize();
+  makeDots();
+  window.addEventListener("resize", () => {
+    resize();
+    makeDots();
+  });
+
+  let running = true;
+  document.addEventListener("visibilitychange", () => {
+    running = document.visibilityState === "visible";
+    if (running) requestAnimationFrame(tick);
+  });
+
+  function tick() {
+    if (!running) return;
+    ctx.clearRect(0, 0, width, height);
+    dots.forEach((d) => {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.x < 0) d.x = width;
+      if (d.x > width) d.x = 0;
+      if (d.y < 0) d.y = height;
+      if (d.y > height) d.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(47, 168, 201, ${d.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+}
+
 // ---------------------------------------------------------- commands page
 
 function showSkeleton(container, count = 5) {
@@ -806,6 +872,16 @@ const TRANSLATIONS = {
     nav_status: "Status", nav_tickets: "Tickets", nav_discord: "Discord",
     nav_docs: "Documentation", nav_premium: "Premium",
     footer_support: "Support Server", footer_privacy: "Privacy", footer_terms: "Terms",
+    footer_cat_docs: "Documentation", footer_cat_support: "Support", footer_cat_legal: "Legal", footer_cat_community: "Community",
+    footer_getting_started: "Getting Started", footer_moderation: "Moderation", footer_antinuke: "Antinuke",
+    footer_music: "Music", footer_levels: "Levels", footer_voicemaster: "VoiceMaster",
+    footer_get_help: "Get Help", footer_refunds: "Refunds", footer_join_discord: "Join our Discord",
+    features_eyebrow: "Everything in one bot", features_title: "Built to replace half a dozen bots",
+    features_lead: "Every category below is a real, working part of blaid - not a roadmap.",
+    feat_mod_title: "Moderation & Security", feat_mod_desc: "Full moderation suite, antinuke, antiraid, honeypots, and a verification gate for risky new accounts.",
+    feat_tickets_title: "Tickets & VoiceMaster", feat_tickets_desc: "Visually build ticket panels on this site, plus join-to-create voice channels with full owner controls.",
+    feat_levels_title: "Leveling & Economy", feat_levels_desc: "XP, custom level-up cards, role rewards, and a full economy with 12 gambling games.",
+    feat_fun_title: "Fun & Utility", feat_fun_desc: "Tic-Tac-Toe, BlackTea, AI answers, reaction/button roles, and a full embed scripting system.",
     home_title: "blaid is Discord's premier all-in-one app",
     home_lead: "Meet the leading bot for management and engagement. Built to elevate your community's experience, streamline server management, and provide you access to premium resources for every necessity.",
     home_invite_btn: "Invite to Discord",
@@ -837,6 +913,16 @@ const TRANSLATIONS = {
     nav_status: "Status", nav_tickets: "Tickets", nav_discord: "Discord",
     nav_docs: "Dokumentation", nav_premium: "Premium",
     footer_support: "Support-Server", footer_privacy: "Datenschutz", footer_terms: "AGB",
+    footer_cat_docs: "Dokumentation", footer_cat_support: "Support", footer_cat_legal: "Rechtliches", footer_cat_community: "Community",
+    footer_getting_started: "Erste Schritte", footer_moderation: "Moderation", footer_antinuke: "Antinuke",
+    footer_music: "Musik", footer_levels: "Level", footer_voicemaster: "VoiceMaster",
+    footer_get_help: "Hilfe bekommen", footer_refunds: "Rückerstattung", footer_join_discord: "Unserem Discord beitreten",
+    features_eyebrow: "Alles in einem Bot", features_title: "Ersetzt ein halbes Dutzend andere Bots",
+    features_lead: "Jede Kategorie unten ist ein echter, funktionierender Teil von blaid - kein Zukunftsversprechen.",
+    feat_mod_title: "Moderation & Sicherheit", feat_mod_desc: "Volle Moderations-Werkzeuge, Antinuke, Antiraid, Honeypots und eine Verifizierungs-Schranke für riskante neue Konten.",
+    feat_tickets_title: "Tickets & VoiceMaster", feat_tickets_desc: "Baut Ticket-Panels visuell auf dieser Seite, plus Join-to-Create-Sprachkanäle mit voller Besitzer-Kontrolle.",
+    feat_levels_title: "Level & Wirtschaft", feat_levels_desc: "XP, eigene Level-Up-Karten, Rollen-Belohnungen und eine volle Wirtschaft mit 12 Glücksspielen.",
+    feat_fun_title: "Spaß & Nützliches", feat_fun_desc: "Tic-Tac-Toe, BlackTea, KI-Antworten, Reaction-/Button-Rollen und ein komplettes Embed-Script-System.",
     home_title: "blaid ist Discords führende All-in-One-App",
     home_lead: "Der führende Bot für Verwaltung und Engagement. Entwickelt, um das Erlebnis eurer Community zu verbessern, die Serververwaltung zu vereinfachen und euch Zugang zu Premium-Funktionen für jeden Bedarf zu geben.",
     home_invite_btn: "Zu Discord einladen",
@@ -868,6 +954,16 @@ const TRANSLATIONS = {
     nav_status: "Statut", nav_tickets: "Tickets", nav_discord: "Discord",
     nav_docs: "Documentation", nav_premium: "Premium",
     footer_support: "Serveur de support", footer_privacy: "Confidentialité", footer_terms: "Conditions",
+    footer_cat_docs: "Documentation", footer_cat_support: "Support", footer_cat_legal: "Mentions légales", footer_cat_community: "Communauté",
+    footer_getting_started: "Premiers pas", footer_moderation: "Modération", footer_antinuke: "Antinuke",
+    footer_music: "Musique", footer_levels: "Niveaux", footer_voicemaster: "VoiceMaster",
+    footer_get_help: "Obtenir de l'aide", footer_refunds: "Remboursements", footer_join_discord: "Rejoindre notre Discord",
+    features_eyebrow: "Tout dans un seul bot", features_title: "Conçu pour remplacer une demi-douzaine de bots",
+    features_lead: "Chaque catégorie ci-dessous fait vraiment partie de blaid, pas une promesse future.",
+    feat_mod_title: "Modération & Sécurité", feat_mod_desc: "Suite de modération complète, antinuke, antiraid, honeypots, et une porte de vérification pour les comptes récents à risque.",
+    feat_tickets_title: "Tickets & VoiceMaster", feat_tickets_desc: "Créez des panneaux de tickets visuellement sur ce site, plus des salons vocaux à la demande avec contrôle total.",
+    feat_levels_title: "Niveaux & Économie", feat_levels_desc: "XP, cartes de niveau personnalisées, récompenses de rôles, et une économie complète avec 12 jeux d'argent.",
+    feat_fun_title: "Fun & Utilitaires", feat_fun_desc: "Morpion, BlackTea, réponses IA, rôles par réaction/bouton, et un système de script d'embed complet.",
     home_title: "blaid est l'application tout-en-un incontournable de Discord",
     home_lead: "Découvrez le bot de référence pour la gestion et l'engagement. Conçu pour améliorer l'expérience de votre communauté, simplifier la gestion du serveur et vous donner accès à des fonctionnalités premium pour chaque besoin.",
     home_invite_btn: "Inviter sur Discord",
@@ -899,6 +995,16 @@ const TRANSLATIONS = {
     nav_status: "Estado", nav_tickets: "Tickets", nav_discord: "Discord",
     nav_docs: "Documentación", nav_premium: "Premium",
     footer_support: "Servidor de soporte", footer_privacy: "Privacidad", footer_terms: "Términos",
+    footer_cat_docs: "Documentación", footer_cat_support: "Soporte", footer_cat_legal: "Legal", footer_cat_community: "Comunidad",
+    footer_getting_started: "Primeros pasos", footer_moderation: "Moderación", footer_antinuke: "Antinuke",
+    footer_music: "Música", footer_levels: "Niveles", footer_voicemaster: "VoiceMaster",
+    footer_get_help: "Obtener ayuda", footer_refunds: "Reembolsos", footer_join_discord: "Únete a nuestro Discord",
+    features_eyebrow: "Todo en un solo bot", features_title: "Hecho para reemplazar media docena de bots",
+    features_lead: "Cada categoría de abajo es una parte real y funcional de blaid, no una promesa futura.",
+    feat_mod_title: "Moderación y Seguridad", feat_mod_desc: "Suite de moderación completa, antinuke, antiraid, honeypots, y una puerta de verificación para cuentas nuevas riesgosas.",
+    feat_tickets_title: "Tickets y VoiceMaster", feat_tickets_desc: "Crea paneles de tickets visualmente en este sitio, además de canales de voz bajo demanda con control total.",
+    feat_levels_title: "Niveles y Economía", feat_levels_desc: "XP, tarjetas de nivel personalizadas, recompensas de roles, y una economía completa con 12 juegos de azar.",
+    feat_fun_title: "Diversión y Utilidad", feat_fun_desc: "Tres en raya, BlackTea, respuestas de IA, roles por reacción/botón, y un sistema completo de scripts de embeds.",
     home_title: "blaid es la app todo-en-uno líder de Discord",
     home_lead: "Conoce el bot líder en gestión y participación. Diseñado para mejorar la experiencia de tu comunidad, simplificar la gestión del servidor y darte acceso a funciones premium para cada necesidad.",
     home_invite_btn: "Invitar a Discord",
@@ -930,6 +1036,16 @@ const TRANSLATIONS = {
     nav_status: "Status", nav_tickets: "Tickets", nav_discord: "Discord",
     nav_docs: "Documentação", nav_premium: "Premium",
     footer_support: "Servidor de suporte", footer_privacy: "Privacidade", footer_terms: "Termos",
+    footer_cat_docs: "Documentação", footer_cat_support: "Suporte", footer_cat_legal: "Legal", footer_cat_community: "Comunidade",
+    footer_getting_started: "Primeiros passos", footer_moderation: "Moderação", footer_antinuke: "Antinuke",
+    footer_music: "Música", footer_levels: "Níveis", footer_voicemaster: "VoiceMaster",
+    footer_get_help: "Obter ajuda", footer_refunds: "Reembolsos", footer_join_discord: "Entre no nosso Discord",
+    features_eyebrow: "Tudo em um só bot", features_title: "Feito para substituir meia dúzia de bots",
+    features_lead: "Cada categoria abaixo é uma parte real e funcional do blaid, não uma promessa futura.",
+    feat_mod_title: "Moderação e Segurança", feat_mod_desc: "Suite de moderação completa, antinuke, antiraid, honeypots, e um portão de verificação para contas novas arriscadas.",
+    feat_tickets_title: "Tickets e VoiceMaster", feat_tickets_desc: "Crie painéis de tickets visualmente neste site, além de canais de voz sob demanda com controle total.",
+    feat_levels_title: "Níveis e Economia", feat_levels_desc: "XP, cartões de nível personalizados, recompensas de cargos, e uma economia completa com 12 jogos de azar.",
+    feat_fun_title: "Diversão e Utilidade", feat_fun_desc: "Jogo da velha, BlackTea, respostas de IA, cargos por reação/botão, e um sistema completo de scripts de embed.",
     home_title: "blaid é o app tudo-em-um líder do Discord",
     home_lead: "Conheça o bot líder em gestão e engajamento. Feito para elevar a experiência da sua comunidade, simplificar a gestão do servidor e dar acesso a recursos premium para cada necessidade.",
     home_invite_btn: "Convidar para o Discord",
@@ -980,6 +1096,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDocsSections();
   applyLinks();
   initReveal();
+  initDotField();
   loadCommands();
   loadStatus();
   initEmbedBuilder();
